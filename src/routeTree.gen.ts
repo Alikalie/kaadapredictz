@@ -10,33 +10,101 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PredictionsRouteImport } from './routes/predictions'
+import { Route as ResultsRouteImport } from './routes/results'
+import { Route as VipRouteImport } from './routes/vip'
+import { Route as PredictionSlugRouteImport } from './routes/prediction.$slug'
+import { Route as PredictionsCategoryRouteImport } from './routes/predictions.$category'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PredictionsRoute = PredictionsRouteImport.update({
+  id: '/predictions',
+  path: '/predictions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResultsRoute = ResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VipRoute = VipRouteImport.update({
+  id: '/vip',
+  path: '/vip',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PredictionSlugRoute = PredictionSlugRouteImport.update({
+  id: '/prediction/$slug',
+  path: '/prediction/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PredictionsCategoryRoute = PredictionsCategoryRouteImport.update({
+  id: '/$category',
+  path: '/$category',
+  getParentRoute: () => PredictionsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/predictions': typeof PredictionsRouteWithChildren
+  '/results': typeof ResultsRoute
+  '/vip': typeof VipRoute
+  '/prediction/$slug': typeof PredictionSlugRoute
+  '/predictions/$category': typeof PredictionsCategoryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/predictions': typeof PredictionsRouteWithChildren
+  '/results': typeof ResultsRoute
+  '/vip': typeof VipRoute
+  '/prediction/$slug': typeof PredictionSlugRoute
+  '/predictions/$category': typeof PredictionsCategoryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/predictions': typeof PredictionsRouteWithChildren
+  '/results': typeof ResultsRoute
+  '/vip': typeof VipRoute
+  '/prediction/$slug': typeof PredictionSlugRoute
+  '/predictions/$category': typeof PredictionsCategoryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/predictions'
+    | '/results'
+    | '/vip'
+    | '/prediction/$slug'
+    | '/predictions/$category'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/predictions'
+    | '/results'
+    | '/vip'
+    | '/prediction/$slug'
+    | '/predictions/$category'
+  id:
+    | '__root__'
+    | '/'
+    | '/predictions'
+    | '/results'
+    | '/vip'
+    | '/prediction/$slug'
+    | '/predictions/$category'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PredictionsRoute: typeof PredictionsRouteWithChildren
+  ResultsRoute: typeof ResultsRoute
+  VipRoute: typeof VipRoute
+  PredictionSlugRoute: typeof PredictionSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +116,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/predictions': {
+      id: '/predictions'
+      path: '/predictions'
+      fullPath: '/predictions'
+      preLoaderRoute: typeof PredictionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/results': {
+      id: '/results'
+      path: '/results'
+      fullPath: '/results'
+      preLoaderRoute: typeof ResultsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vip': {
+      id: '/vip'
+      path: '/vip'
+      fullPath: '/vip'
+      preLoaderRoute: typeof VipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/prediction/$slug': {
+      id: '/prediction/$slug'
+      path: '/prediction/$slug'
+      fullPath: '/prediction/$slug'
+      preLoaderRoute: typeof PredictionSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/predictions/$category': {
+      id: '/predictions/$category'
+      path: '/$category'
+      fullPath: '/predictions/$category'
+      preLoaderRoute: typeof PredictionsCategoryRouteImport
+      parentRoute: typeof PredictionsRoute
+    }
   }
 }
 
+interface PredictionsRouteChildren {
+  PredictionsCategoryRoute: typeof PredictionsCategoryRoute
+}
+
+const PredictionsRouteChildren: PredictionsRouteChildren = {
+  PredictionsCategoryRoute: PredictionsCategoryRoute,
+}
+
+const PredictionsRouteWithChildren = PredictionsRoute._addFileChildren(
+  PredictionsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PredictionsRoute: PredictionsRouteWithChildren,
+  ResultsRoute: ResultsRoute,
+  VipRoute: VipRoute,
+  PredictionSlugRoute: PredictionSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
