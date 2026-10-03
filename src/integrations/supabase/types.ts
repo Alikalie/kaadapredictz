@@ -14,16 +14,473 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      advertisements: {
+        Row: {
+          content: string
+          destination_url: string | null
+          device: string
+          ends_at: string | null
+          id: string
+          is_active: boolean
+          name: string
+          placement: string
+          priority: number
+          starts_at: string | null
+        }
+        Insert: {
+          content: string
+          destination_url?: string | null
+          device?: string
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          placement: string
+          priority?: number
+          starts_at?: string | null
+        }
+        Update: {
+          content?: string
+          destination_url?: string | null
+          device?: string
+          ends_at?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          placement?: string
+          priority?: number
+          starts_at?: string | null
+        }
+        Relationships: []
+      }
+      articles: {
+        Row: {
+          author: string
+          category: string
+          content: string
+          created_at: string
+          excerpt: string
+          id: string
+          published_at: string | null
+          read_minutes: number
+          slug: string
+          status: Database["public"]["Enums"]["content_status"]
+          title: string
+        }
+        Insert: {
+          author?: string
+          category?: string
+          content?: string
+          created_at?: string
+          excerpt?: string
+          id?: string
+          published_at?: string | null
+          read_minutes?: number
+          slug: string
+          status?: Database["public"]["Enums"]["content_status"]
+          title: string
+        }
+        Update: {
+          author?: string
+          category?: string
+          content?: string
+          created_at?: string
+          excerpt?: string
+          id?: string
+          published_at?: string | null
+          read_minutes?: number
+          slug?: string
+          status?: Database["public"]["Enums"]["content_status"]
+          title?: string
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string
+          created_at: string
+          details: Json
+          entity_id: string | null
+          entity_type: string
+          id: number
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          created_at?: string
+          details?: Json
+          entity_id?: string | null
+          entity_type: string
+          id?: never
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          created_at?: string
+          details?: Json
+          entity_id?: string | null
+          entity_type?: string
+          id?: never
+        }
+        Relationships: []
+      }
+      feedback: {
+        Row: {
+          attachment_url: string | null
+          category: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          message: string
+          reference: string
+          status: Database["public"]["Enums"]["feedback_status"]
+          subject: string
+          whatsapp: string | null
+        }
+        Insert: {
+          attachment_url?: string | null
+          category: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          message: string
+          reference: string
+          status?: Database["public"]["Enums"]["feedback_status"]
+          subject: string
+          whatsapp?: string | null
+        }
+        Update: {
+          attachment_url?: string | null
+          category?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          message?: string
+          reference?: string
+          status?: Database["public"]["Enums"]["feedback_status"]
+          subject?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      navigation_items: {
+        Row: {
+          id: string
+          is_active: boolean
+          label: string
+          new_tab: boolean
+          parent_id: string | null
+          sort_order: number
+          url: string
+        }
+        Insert: {
+          id?: string
+          is_active?: boolean
+          label: string
+          new_tab?: boolean
+          parent_id?: string | null
+          sort_order?: number
+          url: string
+        }
+        Update: {
+          id?: string
+          is_active?: boolean
+          label?: string
+          new_tab?: boolean
+          parent_id?: string | null
+          sort_order?: number
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "navigation_items_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "navigation_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      newsletter_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_active: boolean
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_active?: boolean
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_active?: boolean
+        }
+        Relationships: []
+      }
+      page_sections: {
+        Row: {
+          content: Json
+          heading: string | null
+          id: string
+          is_active: boolean
+          page_slug: string
+          section_type: string
+          sort_order: number
+        }
+        Insert: {
+          content?: Json
+          heading?: string | null
+          id?: string
+          is_active?: boolean
+          page_slug: string
+          section_type: string
+          sort_order?: number
+        }
+        Update: {
+          content?: Json
+          heading?: string | null
+          id?: string
+          is_active?: boolean
+          page_slug?: string
+          section_type?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      prediction_categories: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      predictions: {
+        Row: {
+          analysis: string
+          away_team: string
+          category_id: string | null
+          confidence: number
+          created_at: string
+          home_team: string
+          id: string
+          is_featured: boolean
+          kickoff: string
+          league: string
+          market: string
+          odds: number
+          selection: string
+          slug: string
+          status: Database["public"]["Enums"]["prediction_status"]
+          updated_at: string
+          venue: string | null
+        }
+        Insert: {
+          analysis?: string
+          away_team: string
+          category_id?: string | null
+          confidence?: number
+          created_at?: string
+          home_team: string
+          id?: string
+          is_featured?: boolean
+          kickoff: string
+          league: string
+          market: string
+          odds: number
+          selection: string
+          slug: string
+          status?: Database["public"]["Enums"]["prediction_status"]
+          updated_at?: string
+          venue?: string | null
+        }
+        Update: {
+          analysis?: string
+          away_team?: string
+          category_id?: string | null
+          confidence?: number
+          created_at?: string
+          home_team?: string
+          id?: string
+          is_featured?: boolean
+          kickoff?: string
+          league?: string
+          market?: string
+          odds?: number
+          selection?: string
+          slug?: string
+          status?: Database["public"]["Enums"]["prediction_status"]
+          updated_at?: string
+          venue?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "predictions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "prediction_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          is_public: boolean
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          is_public?: boolean
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          is_public?: boolean
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vip_packages: {
+        Row: {
+          benefits: string[]
+          currency: string
+          description: string
+          duration_days: number
+          id: string
+          is_active: boolean
+          name: string
+          price: number
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          benefits?: string[]
+          currency?: string
+          description?: string
+          duration_days: number
+          id?: string
+          is_active?: boolean
+          name: string
+          price: number
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          benefits?: string[]
+          currency?: string
+          description?: string
+          duration_days?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          price?: number
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role:
+        | "super_admin"
+        | "content_admin"
+        | "support_admin"
+        | "prediction_analyst"
+      content_status: "draft" | "published" | "archived"
+      feedback_status: "new" | "open" | "in_progress" | "replied" | "closed"
+      prediction_status:
+        | "draft"
+        | "published"
+        | "pending"
+        | "won"
+        | "lost"
+        | "void"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +607,23 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: [
+        "super_admin",
+        "content_admin",
+        "support_admin",
+        "prediction_analyst",
+      ],
+      content_status: ["draft", "published", "archived"],
+      feedback_status: ["new", "open", "in_progress", "replied", "closed"],
+      prediction_status: [
+        "draft",
+        "published",
+        "pending",
+        "won",
+        "lost",
+        "void",
+      ],
+    },
   },
 } as const
