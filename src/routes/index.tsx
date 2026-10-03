@@ -1,24 +1,19 @@
-import { createFileRoute } from "@tanstack/react-router";
-
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
-export const Route = createFileRoute("/")({
-  component: Index,
-});
-
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { ArrowRight, BarChart3, CheckCircle2, ChevronRight, Crown, Target } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { PredictionTable } from "@/components/prediction-table";
+import { TrustNotice } from "@/components/site-shell";
+import { getPublicContent } from "@/lib/content.functions";
+const contentQuery=queryOptions({queryKey:['public-content'],queryFn:()=>getPublicContent()});
+export const Route=createFileRoute("/")({loader:({context})=>context.queryClient.ensureQueryData(contentQuery),head:()=>({meta:[{title:"KAADA PREDICTZ — Football Predictions & Analysis"},{name:"description",content:"Daily football predictions, transparent results, market guides and VIP analysis."},{property:"og:title",content:"KAADA PREDICTZ — Football Predictions & Analysis"},{property:"og:description",content:"Read the game with daily football analysis and transparent performance."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary_large_image"}]}),component:Index});
+function Index(){const {data}=useSuspenseQuery(contentQuery);const future=data.predictions.filter(p=>new Date(p.kickoff)>new Date());const featured=future.find(p=>p.is_featured)??future[0];const completed=data.predictions.filter(p=>['won','lost','void'].includes(p.status));const won=completed.filter(p=>p.status==='won').length;const rate=completed.length?Math.round(won/completed.length*100):0;return <>
+<section className="hero-grid border-b border-border"><div className="mx-auto grid max-w-7xl gap-12 px-4 py-14 lg:grid-cols-[1.15fr_.85fr] lg:px-8 lg:py-20"><div className="animate-rise self-center"><p className="eyebrow">Independent football analysis</p><h1 className="mt-4 max-w-4xl font-display text-5xl font-black leading-[.96] md:text-7xl">READ THE GAME.<br/><span className="text-primary">BACK YOUR JUDGMENT.</span></h1><p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground">Data-informed match previews, clear market selections and a public record of every result.</p><div className="mt-8 flex flex-wrap gap-3"><Button asChild size="lg"><Link to="/predictions">Today’s predictions <ArrowRight/></Link></Button><Button asChild size="lg" variant="outline"><Link to="/results">View performance</Link></Button></div></div>
+{featured&&<Link to="/prediction/$slug" params={{slug:featured.slug}} className="group relative overflow-hidden border border-primary/40 bg-card p-6 shadow-2xl shadow-primary/10"><div className="absolute right-0 top-0 bg-primary px-4 py-2 text-[10px] font-black uppercase tracking-widest text-primary-foreground">Featured pick</div><p className="text-xs font-bold text-primary">{featured.league}</p><div className="mt-12 grid grid-cols-[1fr_auto_1fr] items-center gap-4 text-center"><span className="font-display text-2xl font-black">{featured.home_team}</span><span className="text-xs text-muted-foreground">VS</span><span className="font-display text-2xl font-black">{featured.away_team}</span></div><div className="mt-8 border-y border-border py-5"><p className="text-xs uppercase tracking-widest text-muted-foreground">Our selection</p><div className="mt-2 flex items-end justify-between"><span className="font-display text-2xl font-black">{featured.selection}</span><span className="font-display text-4xl font-black text-primary">{Number(featured.odds).toFixed(2)}</span></div></div><div className="mt-5 flex items-center justify-between text-xs"><span className="text-muted-foreground">Confidence</span><span className="font-black">{featured.confidence}%</span></div><div className="mt-2 h-1 bg-muted"><div className="h-full bg-primary" style={{width:`${featured.confidence}%`}}/></div><span className="mt-6 flex items-center gap-1 text-sm font-bold text-primary">Read full analysis <ChevronRight className="size-4 transition-transform group-hover:translate-x-1"/></span></Link>}</div></section>
+<section className="border-b border-border"><div className="mx-auto max-w-7xl px-4 py-12 lg:px-8"><div className="grid gap-px bg-border sm:grid-cols-3"><Stat icon={<Target/>} value={`${future.length}`} label="Live picks"/><Stat icon={<BarChart3/>} value={`${rate}%`} label="Recorded win rate"/><Stat icon={<CheckCircle2/>} value={`${completed.length}`} label="Settled selections"/></div></div></section>
+<section className="mx-auto max-w-7xl px-4 py-16 lg:px-8"><SectionHead eyebrow="Today’s board" title="The latest predictions" to="/predictions"/><div className="mt-8"><PredictionTable items={future.slice(0,5) as never[]}/></div></section>
+<section className="border-y border-border bg-card"><div className="mx-auto max-w-7xl px-4 py-16 lg:px-8"><SectionHead eyebrow="Market finder" title="Choose your angle" to="/predictions"/><div className="mt-8 grid grid-cols-2 gap-px bg-border md:grid-cols-4">{data.categories.slice(0,8).map(c=><Link key={c.id} to="/predictions/$category" params={{category:c.slug}} className="group bg-card p-5 hover:bg-accent"><p className="font-display text-xl font-black group-hover:text-primary">{c.name}</p><p className="mt-2 line-clamp-2 text-xs leading-5 text-muted-foreground">{c.description}</p><ArrowRight className="mt-5 size-4 text-primary"/></Link>)}</div></div></section>
+<section className="mx-auto grid max-w-7xl gap-8 px-4 py-16 lg:grid-cols-[1fr_1.2fr] lg:px-8"><div className="bg-primary p-8 text-primary-foreground"><Crown className="size-8"/><p className="mt-12 text-xs font-black uppercase tracking-widest">KAADA VIP</p><h2 className="mt-3 font-display text-4xl font-black">More context.<br/>Deeper analysis.</h2><p className="mt-4 max-w-md text-sm leading-6 opacity-80">Unlock expanded analyst notes, early market alerts and priority updates.</p><Button asChild variant="secondary" className="mt-8"><Link to="/vip">Explore VIP plans <ArrowRight/></Link></Button></div><div><SectionHead eyebrow="Knowledge center" title="Learn the markets" to="/guides"/><div className="mt-6 divide-y divide-border border-y border-border">{data.articles.slice(0,3).map(a=><Link key={a.id} to="/guides/$slug" params={{slug:a.slug}} className="group grid grid-cols-[auto_1fr_auto] items-center gap-4 py-5"><span className="text-xs font-black text-primary">0{data.articles.indexOf(a)+1}</span><div><p className="font-display text-lg font-bold group-hover:text-primary">{a.title}</p><p className="mt-1 text-xs text-muted-foreground">{a.category} · {a.read_minutes} min read</p></div><ArrowRight className="size-4"/></Link>)}</div></div></section>
+<div className="mx-auto max-w-7xl px-4 pb-16 lg:px-8"><TrustNotice/></div></>}
+function Stat({icon,value,label}:{icon:React.ReactNode;value:string;label:string}){return <div className="flex items-center gap-4 bg-background p-6"><span className="text-primary">{icon}</span><div><p className="font-display text-3xl font-black">{value}</p><p className="text-xs text-muted-foreground">{label}</p></div></div>}
+function SectionHead({eyebrow,title,to}:{eyebrow:string;title:string;to:string}){return <div className="flex items-end justify-between gap-4"><div><p className="eyebrow">{eyebrow}</p><h2 className="mt-2 font-display text-3xl font-black md:text-4xl">{title}</h2></div><Link to={to} className="hidden items-center gap-1 text-sm font-bold text-primary sm:flex">View all <ArrowRight className="size-4"/></Link></div>}
