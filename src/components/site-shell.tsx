@@ -1,11 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, X, ShieldCheck, Instagram, Send, LockKeyhole } from "lucide-react";
+import { Menu, X, ShieldCheck, Instagram, Send } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 
 const nav = [
   ["Predictions", "/predictions"], ["Results", "/results"], ["VIP", "/vip"],
-  ["Tips & Guides", "/guides"], ["About", "/about"], ["Contact", "/contact"],
+  ["Tips & Guides", "/guides"], ["AI Analysis", "/analysis"], ["About", "/about"], ["Contact", "/contact"],
 ] as const;
 
 export function Wordmark() {
@@ -16,15 +16,15 @@ export function SiteShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return <div className="min-h-screen bg-background text-foreground">
-    <div className="border-b border-primary/20 bg-primary py-2 text-center text-[11px] font-bold uppercase tracking-widest text-primary-foreground">18+ • Play responsibly • Predictions are informational, never guaranteed</div>
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-xl">
       <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 lg:px-8"><Wordmark />
         <nav className="hidden items-center gap-7 lg:flex">{nav.map(([label,to]) => <Link key={to} to={to} className={`text-sm font-semibold transition-colors hover:text-primary ${pathname.startsWith(to) ? 'text-primary' : 'text-muted-foreground'}`}>{label}</Link>)}</nav>
-        <div className="hidden items-center gap-2 lg:flex"><Button asChild variant="ghost" size="sm"><Link to="/auth"><LockKeyhole /> Sign in</Link></Button><Button asChild size="sm"><Link to="/vip">Join VIP</Link></Button></div>
+        <div className="hidden items-center gap-2 lg:flex"><Button asChild size="sm"><Link to="/vip">Join VIP</Link></Button></div>
         <Button aria-label="Toggle menu" variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</Button>
       </div>
-      {open && <nav className="border-t border-border px-4 py-4 lg:hidden">{nav.map(([label,to]) => <Link key={to} to={to} onClick={() => setOpen(false)} className="block border-b border-border py-3 text-sm font-bold">{label}</Link>)}<Link to="/auth" className="mt-3 block py-2 text-sm font-bold text-primary">Admin sign in</Link></nav>}
+      {open && <nav className="border-t border-border px-4 py-4 lg:hidden">{nav.map(([label,to]) => <Link key={to} to={to} onClick={() => setOpen(false)} className="block border-b border-border py-3 text-sm font-bold">{label}</Link>)}</nav>}
     </header>
+    <div className="border-b border-primary/20 bg-primary px-4 py-2 text-center text-[11px] font-bold uppercase text-primary-foreground">18+ • Play responsibly • Predictions are informational, never guaranteed</div>
     <main>{children}</main>
     <footer className="border-t border-border bg-card">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-[1.5fr_1fr_1fr_1fr] lg:px-8"><div><Wordmark/><p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">Football analysis built on form, context and transparent results. Make your own decisions and play responsibly.</p></div><FooterGroup title="Explore" links={[["Predictions","/predictions"],["Results","/results"],["VIP","/vip"]]} /><FooterGroup title="Learn" links={[["Guides","/guides"],["About","/about"],["Contact","/contact"]]} /><div><h3 className="text-xs font-black uppercase tracking-widest">Follow the game</h3><div className="mt-4 flex gap-2"><Button variant="outline" size="icon" aria-label="Instagram"><Instagram/></Button><Button variant="outline" size="icon" aria-label="Telegram"><Send/></Button></div></div></div>

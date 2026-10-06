@@ -1,0 +1,5 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { PageHeader, TrustNotice } from '@/components/site-shell';
+import { pageMeta } from '@/lib/public-content';
+export const Route = createFileRoute('/about')({ head: () => pageMeta('About', 'Independent football analysis and transparent prediction results.'), component: About });
+function About() { return <><PageHeader eyebrow="Our approach" title="About KAADA PREDICTZ" copy="Independent football analysis with a transparent record of every selection." /><div className="mx-auto max-w-4xl px-4 py-12"><h2 className="font-display text-2xl font-bold">Context before conviction</h2><p className="my-6 leading-8 text-muted-foreground">Our published tips bring together match context, market selections and analyst notes. Every result stays on the record, including losses and void selections. Confidence is an analyst assessment, not a promise of a win.</p><TrustNotice /></div></>; }

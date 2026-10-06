@@ -1,0 +1,5 @@
+import { createFileRoute, notFound } from '@tanstack/react-router';
+import { publicContentQuery, pageMeta } from '@/lib/public-content';
+import { TrustNotice } from '@/components/site-shell';
+export const Route = createFileRoute('/guides/$slug')({ loader: async ({ context, params }) => { const data = await context.queryClient.ensureQueryData(publicContentQuery); const article = data.articles.find(a => a.slug === params.slug); if (!article) throw notFound(); return article; }, head: ({ loaderData }) => pageMeta(loaderData?.title ?? 'Football guide', loaderData?.excerpt ?? 'KAADA PREDICTZ football market guide.', 'article'), component: Article });
+function Article() { const a = Route.useLoaderData(); return <article className="mx-auto max-w-4xl px-4 py-14 lg:px-8"><p className="eyebrow">{a.category} · {a.read_minutes} min read</p><h1 className="mt-4 font-display text-4xl font-black leading-tight">{a.title}</h1><p className="mt-4 text-sm text-muted-foreground">By {a.author}</p><p className="my-8 text-xl leading-8">{a.excerpt}</p><div className="mb-10 whitespace-pre-wrap leading-8 text-muted-foreground">{a.content}</div><TrustNotice /></article>; }

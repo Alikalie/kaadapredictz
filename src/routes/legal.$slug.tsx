@@ -1,0 +1,10 @@
+import { createFileRoute, notFound } from '@tanstack/react-router';
+import { pageMeta } from '@/lib/public-content';
+import { PageHeader } from '@/components/site-shell';
+const policies: Record<string, { title: string; text: string }> = {
+  'responsible-betting': { title: 'Responsible Betting', text: '18+ only. Predictions are information, not guaranteed outcomes or financial advice. Never stake money you cannot afford to lose. Set limits and take breaks. Past performance does not guarantee future results. If gambling causes distress, stop and seek support from a local gambling support service.' },
+  privacy: { title: 'Privacy', text: 'Account details are used to manage member access. Messages submitted through Contact are stored for support. Fixtures submitted for AI analysis are processed by the AI service together with relevant platform prediction data. Do not submit sensitive personal information in fixture fields. Contact us about your data through the Contact page.' },
+  terms: { title: 'Terms', text: 'KAADA PREDICTZ publishes football opinions for adults. Selections and AI analysis are not guarantees. You remain responsible for your own decisions. AI output may contain errors and should be checked against the published source tips. No payments are collected through the current VIP page.' },
+};
+export const Route = createFileRoute('/legal/$slug')({ loader: ({ params }) => { const policy = policies[params.slug]; if (!policy) throw notFound(); return policy; }, head: ({ loaderData }) => pageMeta(loaderData?.title ?? 'Legal', loaderData?.text.slice(0, 150) ?? 'KAADA PREDICTZ policies.'), component: Legal });
+function Legal() { const p = Route.useLoaderData(); return <><PageHeader eyebrow="KAADA PREDICTZ policies" title={p.title} copy="" /><div className="mx-auto max-w-4xl px-4 py-12 leading-8 text-muted-foreground">{p.text}</div></>; }
