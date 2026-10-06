@@ -10,3 +10,5 @@
 <!-- LOVABLE:END -->
 
 - Use a shared public data module for public pages and protected server functions for CMS writes, keeping all routes independently indexable.
+- Parent content routes render Outlet for category/article children, so direct navigation and typed links resolve independently.
+- Member AI analysis uses authenticated server functions and server-only Responses SDK helpers; fixtures are grounded only in published prediction rows.
