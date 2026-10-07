@@ -2,7 +2,7 @@ import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 const entity = z.enum(['predictions','prediction_categories','articles','vip_packages','page_sections','site_settings','feedback','profiles','vip_requests']);
-async function assertAdmin(context: { supabase: any; userId: string }) { const { data, error } = await context.supabase.rpc('is_site_admin', { _user_id: context.userId }); if (error || !data) throw new Error('Administrator access required.'); }
+async function assertAdmin(context: { supabase: any; userId: string }) { const { data, error } = await context.supabase.rpc('has_role', { _user_id: context.userId, _role:'super_admin' }); if (error || !data) throw new Error('Administrator access required.'); }
 export const getAdminData = createServerFn({ method: 'GET' }).middleware([requireSupabaseAuth]).handler(async ({ context }) => { await assertAdmin(context); const names = entity.options; const result: Record<string, unknown[]> = {}; for (const name of names) { const { data, error } = await context.supabase.from(name).select('*').limit(500); if (error) throw new Error(error.message); result[name] = data ?? []; } return result; });
 const schemas = {
  predictions: z.object({ slug:z.string().min(2),league:z.string().min(2),home_team:z.string().min(2),away_team:z.string().min(2),kickoff:z.string().min(5),category_id:z.string().uuid().nullable(),market:z.string().min(1),selection:z.string().min(1),odds:z.coerce.number().positive(),confidence:z.coerce.number().int().min(0).max(100),analysis:z.string(),venue:z.string().nullable(),status:z.enum(['draft','published','pending','won','lost','void']),is_featured:z.boolean() }),
