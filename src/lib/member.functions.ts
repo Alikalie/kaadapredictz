@@ -1,0 +1,5 @@
+import { createServerFn } from '@tanstack/react-start';
+import { z } from 'zod';
+import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
+export const saveMyProfile = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth]).inputValidator(input => z.object({ full_name: z.string().trim().min(2).max(120), phone: z.string().trim().max(40), country: z.string().trim().max(80) }).parse(input)).handler(async ({ data, context }) => { const { error } = await context.supabase.from('profiles').upsert({ id: context.userId, ...data }); if (error) throw new Error('Your profile could not be saved.'); return { ok: true }; });
+export const requestVip = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth]).inputValidator(input => z.object({ package_id: z.string().uuid(), message: z.string().trim().max(1000) }).parse(input)).handler(async ({ data, context }) => { const { error } = await context.supabase.from('vip_requests').insert({ user_id: context.userId, ...data }); if (error) throw new Error('Your VIP request could not be sent.'); return { ok: true }; });

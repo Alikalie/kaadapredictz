@@ -1,11 +1,11 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, X, ShieldCheck, Instagram, Send } from "lucide-react";
+import { Menu, X, ShieldCheck, Facebook, Send } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 
 const nav = [
   ["Predictions", "/predictions"], ["Results", "/results"], ["VIP", "/vip"],
-  ["Tips & Guides", "/guides"], ["AI Analysis", "/analysis"], ["About", "/about"], ["Contact", "/contact"],
+  ["Tips & Guides", "/guides"], ["About", "/about"], ["Contact", "/contact"],
 ] as const;
 
 export function Wordmark() {
@@ -27,7 +27,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
     <div className="border-b border-primary/20 bg-primary px-4 py-2 text-center text-[11px] font-bold uppercase text-primary-foreground">18+ • Play responsibly • Predictions are informational, never guaranteed</div>
     <main>{children}</main>
     <footer className="border-t border-border bg-card">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-[1.5fr_1fr_1fr_1fr] lg:px-8"><div><Wordmark/><p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">Football analysis built on form, context and transparent results. Make your own decisions and play responsibly.</p></div><FooterGroup title="Explore" links={[["Predictions","/predictions"],["Results","/results"],["VIP","/vip"]]} /><FooterGroup title="Learn" links={[["Guides","/guides"],["About","/about"],["Contact","/contact"]]} /><div><h3 className="text-xs font-black uppercase tracking-widest">Follow the game</h3><div className="mt-4 flex gap-2"><Button variant="outline" size="icon" aria-label="Instagram"><Instagram/></Button><Button variant="outline" size="icon" aria-label="Telegram"><Send/></Button></div></div></div>
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-[1.5fr_1fr_1fr_1fr] lg:px-8"><div><Wordmark/><p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">Football analysis built on form, context and transparent results. Make your own decisions and play responsibly.</p></div><FooterGroup title="Explore" links={[["Predictions","/predictions"],["Results","/results"],["VIP","/vip"]]} /><FooterGroup title="Learn" links={[["Guides","/guides"],["About","/about"],["Contact","/contact"]]} /><div><h3 className="text-xs font-black uppercase tracking-widest">Follow the game</h3><div className="mt-4 flex gap-2"><Button asChild variant="outline" size="icon"><a href="https://t.me/kaadapredictz" target="_blank" rel="noreferrer" aria-label="Telegram"><Send/></a></Button><Button asChild variant="outline" size="icon"><a href="https://facebook.com/kaadapredictz" target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook/></a></Button></div></div></div>
       <div className="border-t border-border"><div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-5 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between lg:px-8"><span>© 2026 KAADA PREDICTZ. All rights reserved.</span><div className="flex flex-wrap gap-4"><Link to="/legal/$slug" params={{slug:'responsible-betting'}}>Responsible Betting</Link><Link to="/legal/$slug" params={{slug:'privacy'}}>Privacy</Link><Link to="/legal/$slug" params={{slug:'terms'}}>Terms</Link></div></div></div>
     </footer>
   </div>;

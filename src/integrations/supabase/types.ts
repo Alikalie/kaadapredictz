@@ -357,21 +357,30 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          country: string | null
           created_at: string
           full_name: string | null
           id: string
+          membership_status: string
+          phone: string | null
         }
         Insert: {
           avatar_url?: string | null
+          country?: string | null
           created_at?: string
           full_name?: string | null
           id: string
+          membership_status?: string
+          phone?: string | null
         }
         Update: {
           avatar_url?: string | null
+          country?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
+          membership_status?: string
+          phone?: string | null
         }
         Relationships: []
       }
@@ -453,6 +462,44 @@ export type Database = {
         }
         Relationships: []
       }
+      vip_requests: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          package_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string
+          package_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          package_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vip_requests_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "vip_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -465,6 +512,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_site_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role:

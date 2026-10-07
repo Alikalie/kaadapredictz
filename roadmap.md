@@ -4,7 +4,11 @@
 - [ ] Move responsible-play banner below navigation and remove navigation sign-in
 - [ ] Show admin predictions in category-filtered tables and historical results
 - [ ] Repair missing pages and typed prediction navigation
-- [ ] Add authenticated AI fixture analysis grounded in platform data
+- [ ] Remove AI fixture analysis and member AI navigation
+- [ ] Add support contact details and WhatsApp, email, Telegram, and Facebook actions
+- [ ] Add full member registration/login, immediate activation, and VIP requests
+- [ ] Add a role-protected `/admin` login and management board
+- [ ] Add full admin CRUD for predictions, categories, results, guides, VIP, About, site settings, members, and support messages
 - [ ] Build shared public layout and design system
 - [ ] Build Home, Predictions, category, detail, Results, VIP, Guides, About, Contact, and Legal pages
 - [ ] Add email/password and Google authentication
