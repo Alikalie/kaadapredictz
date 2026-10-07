@@ -19,14 +19,15 @@ function publicClient() {
 
 export const getPublicContent = createServerFn({ method: "GET" }).handler(async () => {
   const db = publicClient();
-  const [categories, predictions, articles, packages, sections] = await Promise.all([
+  const [categories, predictions, articles, packages, sections, settings] = await Promise.all([
     db.from('prediction_categories').select('*').eq('is_active',true).order('sort_order'),
     db.from('predictions').select('*, prediction_categories(name,slug)').neq('status','draft').order('kickoff'),
     db.from('articles').select('*').eq('status','published').order('published_at', { ascending: false }),
     db.from('vip_packages').select('*').eq('is_active',true).order('sort_order'),
-    db.from('page_sections').select('*').eq('page_slug','home').order('sort_order'),
+    db.from('page_sections').select('*').eq('is_active',true).order('sort_order'),
+    db.from('site_settings').select('*').eq('is_public',true),
   ]);
-  const error = categories.error ?? predictions.error ?? articles.error ?? packages.error ?? sections.error;
+  const error = categories.error ?? predictions.error ?? articles.error ?? packages.error ?? sections.error ?? settings.error;
   if (error) throw new Error(error.message);
-  return { categories: categories.data ?? [], predictions: predictions.data ?? [], articles: articles.data ?? [], packages: packages.data ?? [], sections: sections.data ?? [] };
+  return { categories: categories.data ?? [], predictions: predictions.data ?? [], articles: articles.data ?? [], packages: packages.data ?? [], sections: sections.data ?? [], settings: settings.data ?? [] };
 });
