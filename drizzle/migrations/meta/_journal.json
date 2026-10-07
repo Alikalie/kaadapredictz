@@ -8,6 +8,13 @@
       "when": 1791005758338,
       "tag": "0000_create_kaada_platform",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791356697189,
+      "tag": "0001_add_member_profiles_vip_requests_and_admin_access",
+      "breakpoints": true
     }
   ]
 }
