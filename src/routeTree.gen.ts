@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -18,6 +19,7 @@ import { Route as GuidesRouteImport } from './routes/guides'
 import { Route as PredictionsRouteImport } from './routes/predictions'
 import { Route as ResultsRouteImport } from './routes/results'
 import { Route as VipRouteImport } from './routes/vip'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as GuidesSlugRouteImport } from './routes/guides.$slug'
 import { Route as LegalSlugRouteImport } from './routes/legal.$slug'
 import { Route as PredictionSlugRouteImport } from './routes/prediction.$slug'
@@ -26,6 +28,10 @@ import { Route as PredictionsCategoryRouteImport } from './routes/predictions.$c
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -68,6 +74,11 @@ const VipRoute = VipRouteImport.update({
   path: '/vip',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const GuidesSlugRoute = GuidesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -99,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/predictions': typeof PredictionsRouteWithChildren
   '/results': typeof ResultsRoute
   '/vip': typeof VipRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/legal/$slug': typeof LegalSlugRoute
   '/prediction/$slug': typeof PredictionSlugRoute
@@ -114,6 +126,7 @@ export interface FileRoutesByTo {
   '/predictions': typeof PredictionsRouteWithChildren
   '/results': typeof ResultsRoute
   '/vip': typeof VipRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/legal/$slug': typeof LegalSlugRoute
   '/prediction/$slug': typeof PredictionSlugRoute
@@ -122,6 +135,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
@@ -130,6 +144,7 @@ export interface FileRoutesById {
   '/predictions': typeof PredictionsRouteWithChildren
   '/results': typeof ResultsRoute
   '/vip': typeof VipRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/guides/$slug': typeof GuidesSlugRoute
   '/legal/$slug': typeof LegalSlugRoute
   '/prediction/$slug': typeof PredictionSlugRoute
@@ -147,6 +162,7 @@ export interface FileRouteTypes {
     | '/predictions'
     | '/results'
     | '/vip'
+    | '/dashboard'
     | '/guides/$slug'
     | '/legal/$slug'
     | '/prediction/$slug'
@@ -162,6 +178,7 @@ export interface FileRouteTypes {
     | '/predictions'
     | '/results'
     | '/vip'
+    | '/dashboard'
     | '/guides/$slug'
     | '/legal/$slug'
     | '/prediction/$slug'
@@ -169,6 +186,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/about'
     | '/admin'
     | '/auth'
@@ -177,6 +195,7 @@ export interface FileRouteTypes {
     | '/predictions'
     | '/results'
     | '/vip'
+    | '/_authenticated/dashboard'
     | '/guides/$slug'
     | '/legal/$slug'
     | '/prediction/$slug'
@@ -185,6 +204,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
@@ -204,6 +224,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -262,6 +289,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VipRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/guides/$slug': {
       id: '/guides/$slug'
       path: '/$slug'
@@ -293,6 +327,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 interface GuidesRouteChildren {
   GuidesSlugRoute: typeof GuidesSlugRoute
 }
@@ -318,6 +363,7 @@ const PredictionsRouteWithChildren = PredictionsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,

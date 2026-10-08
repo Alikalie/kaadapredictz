@@ -1,7 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, X, ShieldCheck, Facebook, Send } from "lucide-react";
+import { Menu, X, ShieldCheck, Facebook, Send, MessageCircle } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { CookieBanner } from "@/components/cookie-banner";
+import { getSetting, publicContentQuery, str } from "@/lib/public-content";
+
+function useSettings() { const { data } = useQuery(publicContentQuery); return data?.settings; }
 
 const nav = [
   ["Predictions", "/predictions"], ["Results", "/results"], ["VIP", "/vip"],
@@ -9,7 +14,9 @@ const nav = [
 ] as const;
 
 export function Wordmark() {
-  return <Link to="/" className="font-display text-xl font-black tracking-normal text-foreground">KAADA <span className="text-primary">PREDICTZ</span></Link>;
+  const name = str(getSetting(useSettings(), 'brand').name, 'KAADA PREDICTZ');
+  const [first, ...rest] = name.split(' ');
+  return <Link to="/" className="font-display text-xl font-black tracking-normal text-foreground">{first} <span className="text-primary">{rest.join(' ')}</span></Link>;
 }
 
 export function SiteShell({ children }: { children: ReactNode }) {
@@ -26,13 +33,25 @@ export function SiteShell({ children }: { children: ReactNode }) {
     </header>
     <div className="border-b border-primary/20 bg-primary px-4 py-2 text-center text-[11px] font-bold uppercase text-primary-foreground">18+ • Play responsibly • Predictions are informational, never guaranteed</div>
     <main>{children}</main>
-    <footer className="border-t border-border bg-card">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-[1.5fr_1fr_1fr_1fr] lg:px-8"><div><Wordmark/><p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">Football analysis built on form, context and transparent results. Make your own decisions and play responsibly.</p></div><FooterGroup title="Explore" links={[["Predictions","/predictions"],["Results","/results"],["VIP","/vip"]]} /><FooterGroup title="Learn" links={[["Guides","/guides"],["About","/about"],["Contact","/contact"]]} /><div><h3 className="text-xs font-black uppercase tracking-widest">Follow the game</h3><div className="mt-4 flex gap-2"><Button asChild variant="outline" size="icon"><a href="https://t.me/kaadapredictz" target="_blank" rel="noreferrer" aria-label="Telegram"><Send/></a></Button><Button asChild variant="outline" size="icon"><a href="https://facebook.com/kaadapredictz" target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook/></a></Button></div></div></div>
-      <div className="border-t border-border"><div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-5 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between lg:px-8"><span>© 2026 KAADA PREDICTZ. All rights reserved.</span><div className="flex flex-wrap gap-4"><Link to="/legal/$slug" params={{slug:'responsible-betting'}}>Responsible Betting</Link><Link to="/legal/$slug" params={{slug:'privacy'}}>Privacy</Link><Link to="/legal/$slug" params={{slug:'terms'}}>Terms</Link></div></div></div>
-    </footer>
+    <SiteFooter />
+    <CookieBanner />
   </div>;
 }
-function FooterGroup({title,links}:{title:string;links:readonly (readonly [string,string])[]}) { return <div><h3 className="text-xs font-black uppercase tracking-widest">{title}</h3><div className="mt-4 grid gap-3">{links.map(([l,t])=><Link key={t} to={t} className="text-sm text-muted-foreground hover:text-primary">{l}</Link>)}</div></div> }
+function SiteFooter() {
+  const settings = useSettings();
+  const f = getSetting(settings, 'footer'); const c = getSetting(settings, 'contact'); const legal = getSetting(settings, 'legal');
+  const links: { label: string; url: string }[] = Array.isArray(f.links) ? f.links.filter((l: any) => l && typeof l.label === 'string' && typeof l.url === 'string') : [];
+  const isInternal = (u: string) => u.startsWith('/');
+  const wa = str(c.whatsapp).replace(/[^0-9]/g, '');
+  return <footer className="border-t border-border bg-card">
+    <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-[1.5fr_1fr_1fr] lg:px-8">
+      <div><Wordmark/><p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">{str(f.about, 'Football analysis built on form, context and transparent results.')}</p></div>
+      <div><h3 className="text-xs font-black uppercase tracking-widest">Explore</h3><div className="mt-4 grid gap-3">{links.map(l => isInternal(l.url) ? <a key={l.url+l.label} href={l.url} className="text-sm text-muted-foreground hover:text-primary">{l.label}</a> : <a key={l.url+l.label} href={l.url} target="_blank" rel="noreferrer" className="text-sm text-muted-foreground hover:text-primary">{l.label}</a>)}<Link to="/dashboard" className="text-sm text-muted-foreground hover:text-primary">My account</Link></div></div>
+      <div><h3 className="text-xs font-black uppercase tracking-widest">Contact</h3>{str(c.email) && <a href={`mailto:${c.email}`} className="mt-4 block text-sm text-muted-foreground hover:text-primary">{c.email}</a>}<div className="mt-4 flex gap-2">{wa && <Button asChild variant="outline" size="icon"><a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer" aria-label="WhatsApp"><MessageCircle/></a></Button>}{str(c.telegram) && <Button asChild variant="outline" size="icon"><a href={c.telegram} target="_blank" rel="noreferrer" aria-label="Telegram"><Send/></a></Button>}{str(c.facebook) && <Button asChild variant="outline" size="icon"><a href={c.facebook} target="_blank" rel="noreferrer" aria-label="Facebook"><Facebook/></a></Button>}</div></div>
+    </div>
+    <div className="border-t border-border"><div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-5 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between lg:px-8"><span>{str(f.copyright, '© 2026 KAADA PREDICTZ. All rights reserved.')}</span><div className="flex flex-wrap gap-4">{Object.entries(legal).map(([slug, v]) => <Link key={slug} to="/legal/$slug" params={{ slug }} className="hover:text-primary">{str((v as any)?.title, slug)}</Link>)}</div></div></div>
+  </footer>;
+}
 
 export function PageHeader({ eyebrow, title, copy }: {eyebrow:string;title:string;copy:string}) { return <section className="border-b border-border bg-card"><div className="mx-auto max-w-7xl px-4 py-14 lg:px-8 lg:py-20"><p className="eyebrow">{eyebrow}</p><h1 className="mt-3 max-w-4xl font-display text-4xl font-black leading-tight md:text-6xl">{title}</h1><p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground">{copy}</p></div></section> }
 export function StatusBadge({status}:{status:string}) { return <span className={`status status-${status}`}>{status}</span> }
