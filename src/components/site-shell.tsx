@@ -52,7 +52,6 @@ function SiteFooter() {
     <div className="border-t border-border"><div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-5 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between lg:px-8"><span>{str(f.copyright, '© 2026 KAADA PREDICTZ. All rights reserved.')}</span><div className="flex flex-wrap gap-4">{Object.entries(legal).map(([slug, v]) => <Link key={slug} to="/legal/$slug" params={{ slug }} className="hover:text-primary">{str((v as any)?.title, slug)}</Link>)}</div></div></div>
   </footer>;
 }
-function FooterGroup({title,links}:{title:string;links:readonly (readonly [string,string])[]}) { return <div><h3 className="text-xs font-black uppercase tracking-widest">{title}</h3><div className="mt-4 grid gap-3">{links.map(([l,t])=><Link key={t} to={t} className="text-sm text-muted-foreground hover:text-primary">{l}</Link>)}</div></div> }
 
 export function PageHeader({ eyebrow, title, copy }: {eyebrow:string;title:string;copy:string}) { return <section className="border-b border-border bg-card"><div className="mx-auto max-w-7xl px-4 py-14 lg:px-8 lg:py-20"><p className="eyebrow">{eyebrow}</p><h1 className="mt-3 max-w-4xl font-display text-4xl font-black leading-tight md:text-6xl">{title}</h1><p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground">{copy}</p></div></section> }
 export function StatusBadge({status}:{status:string}) { return <span className={`status status-${status}`}>{status}</span> }
