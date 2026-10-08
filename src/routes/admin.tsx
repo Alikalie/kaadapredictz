@@ -12,7 +12,7 @@ import { deleteAdminRecord, getAdminData, saveAdminRecord } from '@/lib/admin.fu
 import { pageMeta } from '@/lib/public-content';
 
 const sections = [
-  ['predictions','Predictions & results'],['prediction_categories','Categories'],['articles','Tips & guides'],['vip_packages','VIP packages'],['page_sections','About & page content'],['site_settings','Site settings'],['feedback','Support inbox'],['profiles','Members'],['vip_requests','VIP requests'],
+  ['predictions','Predictions & results'],['prediction_categories','Categories'],['articles','Tips & guides'],['vip_packages','VIP packages'],['page_sections','About & page content'],['site_settings','Site settings (name, landing, footer, contacts, legal)'],['feedback','Support inbox'],['profiles','Members'],['vip_requests','VIP requests'],
 ] as const;
 type Entity = typeof sections[number][0];
 type Row = Record<string, unknown>;
@@ -22,7 +22,7 @@ const editable: Record<Entity,string[]> = {
  articles:['slug','title','excerpt','content','category','author','read_minutes','status','published_at'],
  vip_packages:['name','slug','price','currency','duration_days','description','benefits','is_active','sort_order'],
  page_sections:['page_slug','section_type','heading','content','sort_order','is_active'],
- site_settings:['value','is_public'], feedback:['status'], profiles:['full_name','phone','country','membership_status'], vip_requests:['status'],
+ site_settings:['key','value','is_public'], feedback:['status'], profiles:['full_name','phone','country','membership_status'], vip_requests:['status'],
 };
 const createable: Entity[]=['predictions','prediction_categories','articles','vip_packages','page_sections','site_settings'];
 const deletable: Entity[]=['predictions','prediction_categories','articles','vip_packages','page_sections','site_settings','feedback','vip_requests'];
