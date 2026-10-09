@@ -8,6 +8,9 @@ import { getMyAccount, saveMyProfile } from '@/lib/member.functions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { pageMeta } from '@/lib/public-content';
+import { PredictionTable } from '@/components/prediction-table';
+import { FixtureAnalysis } from '@/components/fixture-analysis';
+import { vipActive } from '@/lib/prediction-metrics';
 
 export const Route = createFileRoute('/_authenticated/dashboard')({ head: () => pageMeta('My dashboard', 'Your KAADA PREDICTZ member dashboard and profile.'), component: Dashboard });
 
@@ -21,7 +24,8 @@ function Dashboard() {
   if (isLoading) return <div className="mx-auto max-w-6xl px-4 py-20">Loading your dashboard…</div>;
   if (error || !data) return <div className="mx-auto max-w-6xl px-4 py-20 text-destructive">Could not load your account.</div>;
   const p = data.profile;
-  const isAdmin = data.roles.length > 0;
+  const isAdmin = data.roles.includes('super_admin');
+  const activeVip = vipActive(data.subscription?.expires_at);
   const name = p?.full_name || data.email;
   return <div className="mx-auto max-w-6xl px-4 py-12 lg:px-8">
     <header className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6">
@@ -29,7 +33,7 @@ function Dashboard() {
       <div className="flex gap-2">{isAdmin && <Button asChild variant="secondary"><Link to="/admin"><ShieldCheck />Admin board</Link></Button>}<Button variant="outline" onClick={async () => { await supabase.auth.signOut(); await navigate({ to: '/' }); }}><LogOut />Log out</Button></div>
     </header>
     <div className="grid gap-px bg-border py-px sm:grid-cols-3 my-8">
-      <Stat icon={<Crown />} label="Membership" value={(p?.membership_status ?? 'free').toUpperCase()} />
+      <Stat icon={<Crown />} label="Membership" value={activeVip?'VIP ACTIVE':'FREE'} />
       <Stat icon={<Target />} label="VIP requests" value={String(data.requests.length)} />
       <Stat icon={<User />} label="Account role" value={isAdmin ? data.roles.join(', ').replaceAll('_', ' ') : 'Member'} />
     </div>
@@ -48,6 +52,8 @@ function Dashboard() {
         <div className="mt-6 grid gap-2 text-sm"><Link to="/predictions" className="text-primary font-bold">Today's predictions →</Link><Link to="/results" className="text-primary font-bold">Past results →</Link><Link to="/contact" className="text-primary font-bold">Contact support →</Link></div>
       </section>
     </div>
+    <section className="mt-10 border-t border-border pt-8"><div className="mb-5 flex flex-wrap items-center justify-between gap-3"><h2 className="font-display text-2xl font-black">VIP odds</h2><p className="text-sm text-muted-foreground">{data.subscription?.expires_at?`Subscription ${activeVip?'expires':'expired'}: ${new Date(data.subscription.expires_at).toLocaleString()}`:'No active VIP subscription'}</p></div>{activeVip||isAdmin?<PredictionTable items={data.vipPredictions}/>:<Button asChild><Link to="/vip">Request VIP access</Link></Button>}</section>
+    <FixtureAnalysis/>
   </div>;
 }
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) { return <div className="flex items-center gap-4 bg-background p-5"><span className="text-primary">{icon}</span><div><p className="text-xs text-muted-foreground">{label}</p><p className="font-display text-lg font-black capitalize">{value}</p></div></div>; }
