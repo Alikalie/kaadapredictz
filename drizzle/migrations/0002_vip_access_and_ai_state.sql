@@ -1,0 +1,16 @@
+ALTER TABLE public.predictions ADD COLUMN IF NOT EXISTS access_level text NOT NULL DEFAULT 'public';
+ALTER TABLE public.predictions ADD COLUMN IF NOT EXISTS result_recorded_at timestamptz;
+CREATE TABLE public.vip_subscriptions (user_id uuid PRIMARY KEY REFERENCES public.profiles(id) ON DELETE CASCADE, expires_at timestamptz NOT NULL, updated_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT ON public.vip_subscriptions TO authenticated;
+GRANT INSERT, UPDATE, DELETE ON public.vip_subscriptions TO authenticated;
+GRANT ALL ON public.vip_subscriptions TO service_role;
+ALTER TABLE public.vip_subscriptions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Members read own subscription" ON public.vip_subscriptions FOR SELECT TO authenticated USING (user_id = auth.uid());
+CREATE POLICY "Super admins manage subscriptions" ON public.vip_subscriptions FOR ALL TO authenticated USING (public.has_role(auth.uid(),'super_admin')) WITH CHECK (public.has_role(auth.uid(),'super_admin'));
+CREATE POLICY "VIP predictions require active subscription" ON public.predictions AS RESTRICTIVE FOR SELECT TO anon, authenticated USING (access_level = 'public' OR public.has_role(auth.uid(),'super_admin') OR public.has_role(auth.uid(),'content_admin') OR public.has_role(auth.uid(),'prediction_analyst') OR EXISTS (SELECT 1 FROM public.vip_subscriptions s WHERE s.user_id = auth.uid() AND s.expires_at > now()));
+CREATE FUNCTION public.record_prediction_result_time() RETURNS trigger LANGUAGE plpgsql SET search_path=public AS $$ BEGIN IF NEW.status IN ('won','lost','void') AND (TG_OP = 'INSERT' OR OLD.status IS DISTINCT FROM NEW.status) THEN NEW.result_recorded_at := now(); END IF; RETURN NEW; END $$;
+CREATE TRIGGER prediction_result_time BEFORE INSERT OR UPDATE ON public.predictions FOR EACH ROW EXECUTE FUNCTION public.record_prediction_result_time();
+UPDATE public.predictions SET result_recorded_at = kickoff WHERE status IN ('won','lost','void');
+CREATE TABLE public.ai_gateway_state (key text PRIMARY KEY, status integer NOT NULL, message text NOT NULL, updated_at timestamptz NOT NULL DEFAULT now());
+GRANT ALL ON public.ai_gateway_state TO service_role;
+ALTER TABLE public.ai_gateway_state ENABLE ROW LEVEL SECURITY;

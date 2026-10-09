@@ -1,5 +1,13 @@
 # KAADA PREDICTZ roadmap
 
+## Current request
+- [ ] Remove public navigation/footer and responsible-play strip from admin
+- [ ] Plain contact settings editor and football homepage visuals
+- [ ] Secure VIP odds and admin-managed subscription expiry
+- [ ] Prediction accuracy summary and timeline
+- [ ] Member fixture analysis through AI Gateway
+- [ ] Verify access rules, controls and preview
+
 - [ ] Create database schema, access rules, and demonstration content
 - [ ] Move responsible-play banner below navigation and remove navigation sign-in
 - [ ] Show admin predictions in category-filtered tables and historical results

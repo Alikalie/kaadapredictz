@@ -22,6 +22,7 @@ export function Wordmark() {
 export function SiteShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) return <div className="min-h-screen bg-background text-foreground">{children}</div>;
   return <div className="min-h-screen bg-background text-foreground">
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-xl">
       <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 lg:px-8"><Wordmark />
@@ -31,7 +32,6 @@ export function SiteShell({ children }: { children: ReactNode }) {
       </div>
       {open && <nav className="border-t border-border px-4 py-4 lg:hidden">{nav.map(([label,to]) => <Link key={to} to={to} onClick={() => setOpen(false)} className="block border-b border-border py-3 text-sm font-bold">{label}</Link>)}</nav>}
     </header>
-    <div className="border-b border-primary/20 bg-primary px-4 py-2 text-center text-[11px] font-bold uppercase text-primary-foreground">18+ • Play responsibly • Predictions are informational, never guaranteed</div>
     <main>{children}</main>
     <SiteFooter />
     <CookieBanner />
