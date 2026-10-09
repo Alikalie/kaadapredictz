@@ -53,6 +53,27 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_gateway_state: {
+        Row: {
+          key: string
+          message: string
+          status: number
+          updated_at: string
+        }
+        Insert: {
+          key: string
+          message: string
+          status: number
+          updated_at?: string
+        }
+        Update: {
+          key?: string
+          message?: string
+          status?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       articles: {
         Row: {
           author: string
@@ -288,6 +309,7 @@ export type Database = {
       }
       predictions: {
         Row: {
+          access_level: string
           analysis: string
           away_team: string
           category_id: string | null
@@ -300,6 +322,7 @@ export type Database = {
           league: string
           market: string
           odds: number
+          result_recorded_at: string | null
           selection: string
           slug: string
           status: Database["public"]["Enums"]["prediction_status"]
@@ -307,6 +330,7 @@ export type Database = {
           venue: string | null
         }
         Insert: {
+          access_level?: string
           analysis?: string
           away_team: string
           category_id?: string | null
@@ -319,6 +343,7 @@ export type Database = {
           league: string
           market: string
           odds: number
+          result_recorded_at?: string | null
           selection: string
           slug: string
           status?: Database["public"]["Enums"]["prediction_status"]
@@ -326,6 +351,7 @@ export type Database = {
           venue?: string | null
         }
         Update: {
+          access_level?: string
           analysis?: string
           away_team?: string
           category_id?: string | null
@@ -338,6 +364,7 @@ export type Database = {
           league?: string
           market?: string
           odds?: number
+          result_recorded_at?: string | null
           selection?: string
           slug?: string
           status?: Database["public"]["Enums"]["prediction_status"]
@@ -496,6 +523,32 @@ export type Database = {
             columns: ["package_id"]
             isOneToOne: false
             referencedRelation: "vip_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vip_subscriptions: {
+        Row: {
+          expires_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          expires_at: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          expires_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vip_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

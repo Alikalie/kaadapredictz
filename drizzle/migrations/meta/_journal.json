@@ -15,6 +15,13 @@
       "when": 1791356697189,
       "tag": "0001_add_member_profiles_vip_requests_and_admin_access",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791509763555,
+      "tag": "0002_vip_access_and_ai_state",
+      "breakpoints": true
     }
   ]
 }
