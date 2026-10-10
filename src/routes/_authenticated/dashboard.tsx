@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { pageMeta } from '@/lib/public-content';
 import { PredictionTable } from '@/components/prediction-table';
-import { FixtureAnalysis } from '@/components/fixture-analysis';
+import { PredictionExplanation } from '@/components/prediction-explanation';
 import { vipActive } from '@/lib/prediction-metrics';
 
 export const Route = createFileRoute('/_authenticated/dashboard')({ head: () => pageMeta('My dashboard', 'Your KAADA PREDICTZ member dashboard and profile.'), component: Dashboard });
@@ -53,7 +53,7 @@ function Dashboard() {
       </section>
     </div>
     <section className="mt-10 border-t border-border pt-8"><div className="mb-5 flex flex-wrap items-center justify-between gap-3"><h2 className="font-display text-2xl font-black">VIP odds</h2><p className="text-sm text-muted-foreground">{data.subscription?.expires_at?`Subscription ${activeVip?'expires':'expired'}: ${new Date(data.subscription.expires_at).toLocaleString()}`:'No active VIP subscription'}</p></div>{activeVip||isAdmin?<PredictionTable items={data.vipPredictions}/>:<Button asChild><Link to="/vip">Request VIP access</Link></Button>}</section>
-    <FixtureAnalysis/>
+    <PredictionExplanation/>
   </div>;
 }
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) { return <div className="flex items-center gap-4 bg-background p-5"><span className="text-primary">{icon}</span><div><p className="text-xs text-muted-foreground">{label}</p><p className="font-display text-lg font-black capitalize">{value}</p></div></div>; }

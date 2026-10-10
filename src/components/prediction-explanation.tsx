@@ -1,0 +1,12 @@
+import {useState} from 'react';
+import {useQuery} from '@tanstack/react-query';
+import {useServerFn} from '@tanstack/react-start';
+import {BookOpen,LoaderCircle} from 'lucide-react';
+import {explainPrediction,listExplainablePredictions} from '@/lib/fixture.functions';
+import {Button} from '@/components/ui/button';
+export function PredictionExplanation(){
+ const list=useServerFn(listExplainablePredictions);const explain=useServerFn(explainPrediction);
+ const {data:predictions=[],isLoading,error:loadError}=useQuery({queryKey:['explainable-predictions'],queryFn:()=>list()});
+ const [id,setId]=useState('');const[busy,setBusy]=useState(false);const[text,setText]=useState('');const[error,setError]=useState('');
+ return <section className="mt-10 border-t border-border pt-8"><p className="eyebrow">Prediction review</p><h2 className="mt-2 font-display text-2xl font-black">Understand a published prediction</h2><form className="mt-5 flex flex-col items-start gap-4" onSubmit={async e=>{e.preventDefault();setBusy(true);setError('');setText('');try{const result=await explain({data:{prediction_id:id}});setText(result.text)}catch(err){setError(err instanceof Error?err.message:'Explanation failed.')}finally{setBusy(false)}}}><label className="grid w-full max-w-xl gap-2 text-sm">Published prediction<select aria-label="Published prediction" className="h-11 w-full rounded-md border border-input bg-background px-3" required value={id} disabled={busy||isLoading} onChange={e=>{setId(e.target.value);setText('');setError('')}}><option value="">{isLoading?'Loading predictions…':'Choose a prediction'}</option>{predictions.map(p=><option key={p.id} value={p.id}>{p.home_team} vs {p.away_team} · {p.selection} · {p.status}</option>)}</select></label><Button disabled={!id||busy}>{busy?<LoaderCircle className="animate-spin"/>:<BookOpen/>}{busy?'Reviewing prediction…':'Explain prediction'}</Button></form>{loadError&&<p role="alert" className="mt-4 text-destructive">Published predictions could not be loaded.</p>}{!isLoading&&!loadError&&!predictions.length&&<p className="mt-4 text-sm text-muted-foreground">No published predictions are available.</p>}{error&&<p role="alert" className="mt-4 text-sm text-destructive">{error}</p>}{text&&<div role="status" className="mt-6 max-w-3xl whitespace-pre-wrap text-sm leading-7">{text}</div>}</section>;
+}
