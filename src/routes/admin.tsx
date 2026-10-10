@@ -1,35 +1,764 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useServerFn } from '@tanstack/react-start';
-import { useEffect, useState } from 'react';
-import { Edit3, LogOut, Plus, RefreshCw, Trash2 } from 'lucide-react';
-import type { Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { deleteAdminRecord, getAdminData, saveAdminRecord } from '@/lib/admin.functions';
-import { pageMeta } from '@/lib/public-content';
-import { AdminAccuracy } from '@/components/admin-accuracy';
+import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState } from "react";
+import {
+  Edit3,
+  LogOut,
+  Plus,
+  RefreshCw,
+  Trash2,
+  Target,
+  Users,
+  Crown,
+  Settings,
+  FileText,
+  Inbox,
+  LayoutDashboard,
+  Layers,
+  CalendarClock,
+  Menu,
+  X,
+  Search,
+  Cookie,
+} from "lucide-react";
+import type { Session } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { deleteAdminRecord, getAdminData, saveAdminRecord } from "@/lib/admin.functions";
+import { pageMeta } from "@/lib/public-content";
+import { AdminAccuracy } from "@/components/admin-accuracy";
 
 const sections = [
-  ['predictions','Predictions & results'],['prediction_categories','Categories'],['articles','Tips & guides'],['vip_packages','VIP packages'],['page_sections','About & page content'],['site_settings','Site settings (name, landing, footer, contacts, legal)'],['feedback','Support inbox'],['profiles','Members'],['vip_requests','VIP requests'],['vip_subscriptions','VIP subscriptions'],
+  ["predictions", "Predictions & results"],
+  ["prediction_categories", "Categories"],
+  ["articles", "Tips & guides"],
+  ["vip_packages", "VIP packages"],
+  ["page_sections", "About & page content"],
+  ["site_settings", "Site settings"],
+  ["feedback", "Support inbox"],
+  ["profiles", "Members"],
+  ["vip_requests", "VIP requests"],
+  ["vip_subscriptions", "VIP subscriptions"],
 ] as const;
-type Entity = typeof sections[number][0];
+type Entity = (typeof sections)[number][0];
 type Row = Record<string, unknown>;
-const editable: Record<Entity,string[]> = {
- predictions:['slug','league','home_team','away_team','kickoff','category_id','market','selection','odds','confidence','analysis','venue','status','is_featured','access_level'],
- prediction_categories:['name','slug','description','sort_order','is_active'],
- articles:['slug','title','excerpt','content','category','author','read_minutes','status','published_at'],
- vip_packages:['name','slug','price','currency','duration_days','description','benefits','is_active','sort_order'],
- page_sections:['page_slug','section_type','heading','content','sort_order','is_active'],
- site_settings:['key','value','is_public'], feedback:['status'], profiles:['full_name','phone','country','membership_status'], vip_requests:['status'], vip_subscriptions:['user_id','expires_at'],
+const editable: Record<Entity, string[]> = {
+  predictions: [
+    "slug",
+    "league",
+    "home_team",
+    "away_team",
+    "kickoff",
+    "category_id",
+    "market",
+    "selection",
+    "odds",
+    "confidence",
+    "analysis",
+    "venue",
+    "status",
+    "is_featured",
+    "access_level",
+  ],
+  prediction_categories: ["name", "slug", "description", "sort_order", "is_active"],
+  articles: [
+    "slug",
+    "title",
+    "excerpt",
+    "content",
+    "category",
+    "author",
+    "read_minutes",
+    "status",
+    "published_at",
+  ],
+  vip_packages: [
+    "name",
+    "slug",
+    "price",
+    "currency",
+    "duration_days",
+    "description",
+    "benefits",
+    "is_active",
+    "sort_order",
+  ],
+  page_sections: ["page_slug", "section_type", "heading", "content", "sort_order", "is_active"],
+  site_settings: ["key", "value", "is_public"],
+  feedback: ["status"],
+  profiles: ["full_name", "phone", "country", "membership_status"],
+  vip_requests: ["status"],
+  vip_subscriptions: ["user_id", "expires_at"],
 };
-const createable: Entity[]=['predictions','prediction_categories','articles','vip_packages','page_sections','site_settings','vip_subscriptions'];
-const deletable: Entity[]=['predictions','prediction_categories','articles','vip_packages','page_sections','site_settings','feedback','vip_requests'];
-const labels:Record<string,string>={home_team:'Home team',away_team:'Away team',category_id:'Category',published_at:'Published at',read_minutes:'Read time (minutes)',duration_days:'Duration (days)',is_active:'Active',is_featured:'Featured',sort_order:'Order',page_slug:'Page',section_type:'Section type',membership_status:'Membership'};
-export const Route=createFileRoute('/admin')({head:()=>pageMeta('Admin','Secure KAADA PREDICTZ content management.'),component:Admin});
-function Admin(){const[session,setSession]=useState<Session|null>(null);const[ready,setReady]=useState(false);useEffect(()=>{void supabase.auth.getSession().then(({data})=>{setSession(data.session);setReady(true)});const{data}=supabase.auth.onAuthStateChange((_e,s)=>{setSession(s);setReady(true)});return()=>data.subscription.unsubscribe()},[]);if(!ready)return <div className="mx-auto max-w-md px-4 py-20">Checking administrator access…</div>;return session?<Dashboard/>:<AdminLogin/>}
-function AdminLogin(){const[message,setMessage]=useState('');const[busy,setBusy]=useState(false);return <div className="mx-auto max-w-md px-4 py-20"><p className="eyebrow">Secure administration</p><h1 className="mt-3 font-display text-4xl font-black">Admin login</h1><form className="mt-8 grid gap-5" onSubmit={async e=>{e.preventDefault();const d=new FormData(e.currentTarget);setBusy(true);setMessage('');const{error}=await supabase.auth.signInWithPassword({email:String(d.get('email')),password:String(d.get('password'))});if(error)setMessage(error.message);setBusy(false)}}><label className="grid gap-2 text-sm">Username or email<Input name="email" type="email" required autoComplete="username"/></label><label className="grid gap-2 text-sm">Password<Input name="password" type="password" required autoComplete="current-password"/></label><Button disabled={busy}>{busy?'Signing in…':'Login to admin board'}</Button>{message&&<p role="alert" className="text-sm text-destructive">{message}</p>}</form></div>}
-function Dashboard(){const getData=useServerFn(getAdminData);const save=useServerFn(saveAdminRecord);const remove=useServerFn(deleteAdminRecord);const[entity,setEntity]=useState<Entity>('predictions');const[data,setData]=useState<Record<string,Row[]>>({});const[message,setMessage]=useState('');const[loading,setLoading]=useState(true);const[editing,setEditing]=useState<Row|null>(null);const[creating,setCreating]=useState(false);const load=async()=>{setLoading(true);setMessage('');try{setData(await getData() as Record<string,Row[]>)}catch(e){setMessage(e instanceof Error?e.message:'Could not load admin data.')}finally{setLoading(false)}};useEffect(()=>{void load()},[]);const rows=data[entity]??[];return <div className="mx-auto max-w-[1500px] px-4 py-10 lg:px-8"><header className="flex flex-wrap items-end justify-between gap-4 border-b border-border pb-6"><div><p className="eyebrow">KAADA PREDICTZ</p><h1 className="mt-2 font-display text-4xl font-black">Admin board</h1></div><div className="flex gap-2"><Button variant="outline" size="icon" onClick={()=>void load()} aria-label="Refresh"><RefreshCw/></Button><Button variant="outline" onClick={()=>void supabase.auth.signOut()}><LogOut/>Log out</Button></div></header><div className="grid gap-8 py-8 lg:grid-cols-[240px_1fr]"><nav className="grid content-start gap-1">{sections.map(([id,label])=><Button key={id} variant={entity===id?'default':'ghost'} className="justify-start" onClick={()=>setEntity(id)}>{label}</Button>)}</nav><main className="min-w-0"><AdminAccuracy rows={data.predictions??[]}/><div className="mb-5 flex items-center justify-between"><div><h2 className="font-display text-2xl font-black">{sections.find(s=>s[0]===entity)?.[1]}</h2><p className="text-sm text-muted-foreground">{rows.length} records</p></div>{createable.includes(entity)&&<Button onClick={()=>setCreating(true)}><Plus/>Add new</Button>}</div>{message&&<p role="alert" className="mb-5 border-l-2 border-destructive px-4 text-sm text-destructive">{message}</p>}{loading?<p>Loading…</p>:<div className="overflow-x-auto border border-border"><table className="w-full min-w-[760px] text-left text-sm"><thead className="bg-muted"><tr><th className="px-4 py-3">Record</th><th className="px-4 py-3">Details</th><th className="px-4 py-3">Status</th><th className="px-4 py-3 text-right">Actions</th></tr></thead><tbody>{rows.map(row=>{const id=String(row.id??row.key??row.user_id);return <tr key={id} className="border-t border-border"><td className="px-4 py-4 font-bold">{String(row.title??row.name??row.subject??row.heading??row.full_name??row.key??id)}</td><td className="max-w-md truncate px-4 py-4 text-muted-foreground">{String(row.home_team?`${row.home_team} vs ${row.away_team}`:row.email??row.description??row.message??row.page_slug??'—')}</td><td className="px-4 py-4">{String(row.status??row.membership_status??(row.is_active===true?'Active':row.is_active===false?'Inactive':'—'))}</td><td className="px-4 py-4"><div className="flex justify-end gap-2"><Button size="icon" variant="outline" aria-label="Edit" onClick={()=>setEditing(row)}><Edit3/></Button>{deletable.includes(entity)&&<Button size="icon" variant="outline" aria-label="Delete" onClick={async()=>{if(!window.confirm('Delete this record permanently?'))return;try{await remove({data:{entity:entity as Exclude<Entity,'profiles'>,id}});await load()}catch(e){setMessage(e instanceof Error?e.message:'Delete failed.')}}}><Trash2/></Button>}</div></td></tr>})}</tbody></table></div>}</main></div><RecordDialog open={creating||Boolean(editing)} entity={entity} row={editing} categories={data.prediction_categories??[]} members={data.profiles??[]} onClose={()=>{setCreating(false);setEditing(null)}} onSave={async(id,values)=>{await save({data:{entity,id,values}});setCreating(false);setEditing(null);await load()}}/></div>}
-function RecordDialog({open,entity,row,categories,members,onClose,onSave}:{open:boolean;entity:Entity;row:Row|null;categories:Row[];members:Row[];onClose:()=>void;onSave:(id:string|undefined,values:Row)=>Promise<void>}){const[error,setError]=useState('');const[busy,setBusy]=useState(false);return <Dialog open={open} onOpenChange={v=>{if(!v)onClose()}}><DialogContent className="max-h-[88vh] max-w-2xl overflow-y-auto"><DialogHeader><DialogTitle>{row?'Edit':'Add'} {sections.find(s=>s[0]===entity)?.[1]}</DialogTitle></DialogHeader><form className="grid gap-4" onSubmit={async e=>{e.preventDefault();const d=new FormData(e.currentTarget);const values:Row={};for(const key of editable[entity]){const raw=d.get(key);if(entity==='site_settings'&&row?.key==='contact'&&key==='value'){values[key]={...(row.value as Row),...Object.fromEntries(['name','email','whatsapp','telegram','facebook','address'].map(k=>[k,String(d.get(`contact_${k}`)??'')]))};}else if(key==='expires_at'){values[key]=new Date(String(raw)).toISOString();}else if(['is_active','is_featured','is_public'].includes(key))values[key]=raw==='on';else if(['odds','confidence','sort_order','read_minutes','price','duration_days'].includes(key))values[key]=Number(raw);else if(key==='benefits')values[key]=String(raw).split('\n').map(s=>s.trim()).filter(Boolean);else if(['content','value'].includes(key)){try{values[key]=JSON.parse(String(raw||'{}'))}catch{setError(`${labels[key]??key} must be valid JSON.`);return}}else if(['category_id','venue','published_at','heading','full_name','phone','country'].includes(key))values[key]=raw?String(raw):null;else values[key]=String(raw??'')}setBusy(true);setError('');try{await onSave(row?String(row.id??row.key??row.user_id):undefined,values)}catch(e){setError(e instanceof Error?e.message:'Save failed.')}finally{setBusy(false)}}}>{editable[entity].map(key=>{const value=row?.[key];const label=labels[key]??key.replaceAll('_',' ');if(entity==='site_settings'&&row?.key==='contact'&&key==='value'){const contact=(value??{}) as Row;return <div key={key} className="grid gap-4">{[['name','Support name'],['email','Email'],['whatsapp','WhatsApp number (with country code)'],['telegram','Telegram link'],['facebook','Facebook link'],['address','Address']].map(([k,l])=><label key={k} className="grid gap-2 text-sm">{l}<Input name={`contact_${k}`} type={k==='email'?'email':'text'} defaultValue={String(contact[k]??'')}/></label>)}</div>;}if(key==='access_level')return <label key={key} className="grid gap-2 text-sm">Audience<select name={key} defaultValue={String(value??'public')} className="h-10 border border-input bg-background px-3"><option value="public">Public</option><option value="vip">VIP members</option></select></label>;if(key==='user_id')return <label key={key} className="grid gap-2 text-sm">Member<select name={key} required defaultValue={String(value??'')} className="h-10 border border-input bg-background px-3"><option value="">Choose member</option>{members.map(m=><option key={String(m.id)} value={String(m.id)}>{String(m.full_name??m.id)}</option>)}</select></label>;if(['is_active','is_featured','is_public'].includes(key))return <label key={key} className="flex items-center gap-3 text-sm"><input name={key} type="checkbox" defaultChecked={Boolean(value)}/>{label}</label>;if(key==='category_id')return <label key={key} className="grid gap-2 text-sm capitalize">{label}<select name={key} defaultValue={String(value??'')} className="h-10 border border-input bg-background px-3"><option value="">No category</option>{categories.map(c=><option key={String(c.id)} value={String(c.id)}>{String(c.name)}</option>)}</select></label>;const large=['analysis','content','excerpt','description','benefits','message','value'].includes(key);const shown=['content','value'].includes(key)?JSON.stringify(value??{},null,2):Array.isArray(value)?value.join('\n'):String(value??'');return <label key={key} className="grid gap-2 text-sm capitalize">{label}{large?<Textarea name={key} rows={key==='content'||key==='value'?7:4} defaultValue={['kickoff','published_at','expires_at'].includes(key)&&shown?new Date(shown).toLocaleString('sv-SE').replace(' ','T').slice(0,16):shown}/>:<Input name={key} type={key==='kickoff'||key==='published_at'||key==='expires_at'?'datetime-local':['odds','confidence','sort_order','read_minutes','price','duration_days'].includes(key)?'number':'text'} step={key==='odds'||key==='price'?'0.01':undefined} defaultValue={['kickoff','published_at','expires_at'].includes(key)&&shown?new Date(shown).toLocaleString('sv-SE').replace(' ','T').slice(0,16):shown}/>}</label>})}{error&&<p role="alert" className="text-sm text-destructive">{error}</p>}<Button disabled={busy}>{busy?'Saving…':'Save changes'}</Button></form></DialogContent></Dialog>}
+const createable: Entity[] = [
+  "predictions",
+  "prediction_categories",
+  "articles",
+  "vip_packages",
+  "page_sections",
+  "site_settings",
+  "vip_subscriptions",
+];
+const deletable: Entity[] = [
+  "predictions",
+  "prediction_categories",
+  "articles",
+  "vip_packages",
+  "page_sections",
+  "site_settings",
+  "feedback",
+  "vip_requests",
+];
+const sectionIcons: Record<Entity, typeof Target> = {
+  predictions: Target,
+  prediction_categories: Layers,
+  articles: FileText,
+  vip_packages: Crown,
+  page_sections: LayoutDashboard,
+  site_settings: Settings,
+  feedback: Inbox,
+  profiles: Users,
+  vip_requests: Crown,
+  vip_subscriptions: CalendarClock,
+};
+const contactFields = [
+  ["name", "Support name"],
+  ["email", "Email"],
+  ["whatsapp", "WhatsApp number (with country code)"],
+  ["telegram", "Telegram link"],
+  ["facebook", "Facebook link"],
+  ["address", "Address"],
+] as const;
+const labels: Record<string, string> = {
+  home_team: "Home team",
+  away_team: "Away team",
+  category_id: "Category",
+  published_at: "Published at",
+  read_minutes: "Read time (minutes)",
+  duration_days: "Duration (days)",
+  is_active: "Active",
+  is_featured: "Featured",
+  sort_order: "Order",
+  page_slug: "Page",
+  section_type: "Section type",
+  membership_status: "Membership",
+};
+export const Route = createFileRoute("/admin")({
+  head: () => pageMeta("Admin", "Secure KAADA PREDICTZ content management."),
+  component: Admin,
+});
+function Admin() {
+  const [session, setSession] = useState<Session | null>(null);
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    void supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setReady(true);
+    });
+    const { data } = supabase.auth.onAuthStateChange((_e, s) => {
+      setSession(s);
+      setReady(true);
+    });
+    return () => data.subscription.unsubscribe();
+  }, []);
+  if (!ready)
+    return <div className="mx-auto max-w-md px-4 py-20">Checking administrator access…</div>;
+  return session ? <Dashboard /> : <AdminLogin />;
+}
+function AdminLogin() {
+  const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState(false);
+  return (
+    <div className="mx-auto max-w-md px-4 py-20">
+      <p className="eyebrow">Secure administration</p>
+      <h1 className="mt-3 font-display text-4xl font-black">Admin login</h1>
+      <form
+        className="mt-8 grid gap-5"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const d = new FormData(e.currentTarget);
+          setBusy(true);
+          setMessage("");
+          const { error } = await supabase.auth.signInWithPassword({
+            email: String(d.get("email")),
+            password: String(d.get("password")),
+          });
+          if (error) setMessage(error.message);
+          setBusy(false);
+        }}
+      >
+        <label className="grid gap-2 text-sm">
+          Username or email
+          <Input name="email" type="email" required autoComplete="username" />
+        </label>
+        <label className="grid gap-2 text-sm">
+          Password
+          <Input name="password" type="password" required autoComplete="current-password" />
+        </label>
+        <Button disabled={busy}>{busy ? "Signing in…" : "Login to admin board"}</Button>
+        {message && (
+          <p role="alert" className="text-sm text-destructive">
+            {message}
+          </p>
+        )}
+      </form>
+    </div>
+  );
+}
+function Dashboard() {
+  const getData = useServerFn(getAdminData);
+  const save = useServerFn(saveAdminRecord);
+  const remove = useServerFn(deleteAdminRecord);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [entity, setEntity] = useState<Entity>("predictions");
+  const [data, setData] = useState<Record<string, Row[]>>({});
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<Row | null>(null);
+  const [creating, setCreating] = useState(false);
+  const load = async () => {
+    setLoading(true);
+    setMessage("");
+    try {
+      setData((await getData()) as Record<string, Row[]>);
+    } catch (e) {
+      setMessage(e instanceof Error ? e.message : "Could not load admin data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    void load();
+  }, []);
+  const rows = (data[entity] ?? []).filter((r) =>
+    JSON.stringify(r).toLowerCase().includes(search.toLowerCase()),
+  );
+  return (
+    <div className="min-h-screen lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
+      <aside
+        className={`admin-sidebar ${sidebarOpen ? "flex" : "hidden"} fixed inset-y-0 left-0 z-50 w-[260px] flex-col border-r border-border bg-card lg:sticky lg:top-0 lg:flex lg:h-screen`}
+      >
+        <div className="flex items-center justify-between border-b border-border p-6">
+          <div>
+            <p className="font-display text-xl font-black">
+              KAADA <span className="text-primary">PREDICTZ</span>
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">Administration</p>
+          </div>
+          <Button
+            aria-label="Close sidebar"
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <X />
+          </Button>
+        </div>
+        <p className="px-6 pb-2 pt-6 text-xs font-bold text-muted-foreground">WORKSPACE</p>
+        <nav aria-label="Admin sections" className="flex-1 space-y-1 overflow-y-auto px-3">
+          {sections.map(([id, label]) => {
+            const Icon = sectionIcons[id];
+            return (
+              <Button
+                key={id}
+                variant={entity === id ? "secondary" : "ghost"}
+                className={`h-11 w-full justify-start gap-3 ${entity === id ? "text-primary" : ""}`}
+                onClick={() => {
+                  setEntity(id);
+                  setSearch("");
+                  setSidebarOpen(false);
+                }}
+              >
+                <Icon className="size-4 shrink-0" />
+                <span className="truncate">{label}</span>
+              </Button>
+            );
+          })}
+          <Button
+            variant="ghost"
+            className="h-11 w-full justify-start gap-3"
+            onClick={() => {
+              setEntity("site_settings");
+              setEditing(
+                (data.site_settings ?? []).find((r) => r.key === "cookies") ?? {
+                  key: "cookies",
+                  value: {
+                    text: "We use essential cookies to keep you signed in and improve your experience.",
+                  },
+                  is_public: true,
+                },
+              );
+              setSidebarOpen(false);
+            }}
+          >
+            <Cookie className="size-4" />
+            Cookie notice
+          </Button>
+        </nav>
+        <div className="border-t border-border p-4">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="grid size-9 place-items-center rounded-md bg-primary text-primary-foreground">
+              <Users className="size-4" />
+            </div>
+            <div>
+              <p className="text-sm font-bold">Site administrator</p>
+              <p className="text-xs text-muted-foreground">Secure workspace</p>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            className="w-full justify-start"
+            onClick={() => void supabase.auth.signOut()}
+          >
+            <LogOut />
+            Log out
+          </Button>
+        </div>
+      </aside>
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-background/80 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      <div className="min-w-0">
+        <header className="flex h-20 items-center justify-between gap-4 border-b border-border px-5 lg:px-8">
+          <div className="flex items-center gap-3">
+            <Button
+              aria-label="Open sidebar"
+              variant="outline"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu />
+            </Button>
+            <div>
+              <p className="text-xs text-muted-foreground">Workspace / Overview</p>
+              <h1 className="font-display text-xl font-bold">Admin board</h1>
+            </div>
+          </div>
+          <Button variant="outline" size="icon" onClick={() => void load()} aria-label="Refresh">
+            <RefreshCw className={loading ? "animate-spin" : ""} />
+          </Button>
+        </header>
+        <div className="p-5 lg:p-8">
+          <main className="min-w-0">
+            {entity === "predictions" && <AdminAccuracy rows={data.predictions ?? []} />}
+            <div className="relative mb-5 max-w-sm">
+              <Search className="absolute left-3 top-3 size-4 text-muted-foreground" />
+              <Input
+                aria-label="Search records"
+                placeholder="Search records…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <div className="mb-5 flex items-center justify-between">
+              <div>
+                <h2 className="font-display text-2xl font-black">
+                  {sections.find((s) => s[0] === entity)?.[1]}
+                </h2>
+                <p className="text-sm text-muted-foreground">{rows.length} records</p>
+              </div>
+              {createable.includes(entity) && (
+                <Button onClick={() => setCreating(true)}>
+                  <Plus />
+                  Add new
+                </Button>
+              )}
+            </div>
+            {message && (
+              <p
+                role="alert"
+                className="mb-5 border-l-2 border-destructive px-4 text-sm text-destructive"
+              >
+                {message}
+              </p>
+            )}
+            {loading ? (
+              <p>Loading…</p>
+            ) : (
+              <div className="overflow-x-auto border border-border">
+                <table className="w-full min-w-[760px] text-left text-sm">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="px-4 py-3">Record</th>
+                      <th className="px-4 py-3">Details</th>
+                      <th className="px-4 py-3">Status</th>
+                      <th className="px-4 py-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((row) => {
+                      const id = String(row.id ?? row.key ?? row.user_id);
+                      return (
+                        <tr key={id} className="border-t border-border">
+                          <td className="px-4 py-4 font-bold">
+                            {String(
+                              row.title ??
+                                row.name ??
+                                (row.home_team ? `${row.home_team} vs ${row.away_team}` : undefined) ??
+                                row.subject ??
+                                row.heading ??
+                                row.full_name ??
+                                row.key ??
+                                id,
+                            )}
+                          </td>
+                          <td className="max-w-md truncate px-4 py-4 text-muted-foreground">
+                            {String(
+                              row.home_team
+                                ? `${row.home_team} vs ${row.away_team}`
+                                : (row.email ??
+                                    row.description ??
+                                    row.message ??
+                                    row.page_slug ??
+                                    "—"),
+                            )}
+                          </td>
+                          <td className="px-4 py-4">
+                            {String(
+                              row.status ??
+                                row.membership_status ??
+                                (row.is_active === true
+                                  ? "Active"
+                                  : row.is_active === false
+                                    ? "Inactive"
+                                    : "—"),
+                            )}
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                size="icon"
+                                variant="outline"
+                                aria-label="Edit"
+                                onClick={() => setEditing(row)}
+                              >
+                                <Edit3 />
+                              </Button>
+                              {deletable.includes(entity) && (
+                                <Button
+                                  size="icon"
+                                  variant="outline"
+                                  aria-label="Delete"
+                                  onClick={async () => {
+                                    if (!window.confirm("Delete this record permanently?")) return;
+                                    try {
+                                      await remove({
+                                        data: {
+                                          entity: entity as Exclude<
+                                            Entity,
+                                            "profiles" | "vip_subscriptions"
+                                          >,
+                                          id,
+                                        },
+                                      });
+                                      await load();
+                                    } catch (e) {
+                                      setMessage(e instanceof Error ? e.message : "Delete failed.");
+                                    }
+                                  }}
+                                >
+                                  <Trash2 />
+                                </Button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </main>
+        </div>
+        <RecordDialog
+          open={creating || Boolean(editing)}
+          entity={entity}
+          row={editing}
+          categories={data.prediction_categories ?? []}
+          members={data.profiles ?? []}
+          onClose={() => {
+            setCreating(false);
+            setEditing(null);
+          }}
+          onSave={async (id, values) => {
+            const existing = (data[entity] ?? []).some(r => String(r.id ?? r.key ?? r.user_id) === id);
+            await save({ data: { entity, id: existing ? id : undefined, values } });
+            setCreating(false);
+            setEditing(null);
+            await load();
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+function RecordDialog({
+  open,
+  entity,
+  row,
+  categories,
+  members,
+  onClose,
+  onSave,
+}: {
+  open: boolean;
+  entity: Entity;
+  row: Row | null;
+  categories: Row[];
+  members: Row[];
+  onClose: () => void;
+  onSave: (id: string | undefined, values: Row) => Promise<void>;
+}) {
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        if (!v) onClose();
+      }}
+    >
+      <DialogContent className="max-h-[88vh] max-w-2xl overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            {row ? "Edit" : "Add"} {sections.find((s) => s[0] === entity)?.[1]}
+          </DialogTitle>
+        </DialogHeader>
+        <form
+          className="grid gap-4"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const d = new FormData(e.currentTarget);
+            const values: Row = {};
+            for (const key of editable[entity]) {
+              const raw = d.get(key);
+              if (entity === "site_settings" && row?.key === "contact" && key === "value") {
+                values[key] = {
+                  ...(row.value as Row),
+                  ...Object.fromEntries(
+                    ["name", "email", "whatsapp", "telegram", "facebook", "address"].map((k) => [
+                      k,
+                      String(d.get(`contact_${k}`) ?? ""),
+                    ]),
+                  ),
+                };
+              } else if (entity === "site_settings" && row?.key === "cookies" && key === "value") {
+                values[key] = { ...(row.value as Row), text: String(d.get("cookie_text") ?? "") };
+              } else if (key === "expires_at") {
+                values[key] = new Date(String(raw)).toISOString();
+              } else if (["is_active", "is_featured", "is_public"].includes(key))
+                values[key] = raw === "on";
+              else if (
+                [
+                  "odds",
+                  "confidence",
+                  "sort_order",
+                  "read_minutes",
+                  "price",
+                  "duration_days",
+                ].includes(key)
+              )
+                values[key] = Number(raw);
+              else if (key === "benefits")
+                values[key] = String(raw)
+                  .split("\n")
+                  .map((s) => s.trim())
+                  .filter(Boolean);
+              else if (["content", "value"].includes(key)) {
+                try {
+                  values[key] = JSON.parse(String(raw || "{}"));
+                } catch {
+                  setError(`${labels[key] ?? key} must be valid JSON.`);
+                  return;
+                }
+              } else if (
+                [
+                  "category_id",
+                  "venue",
+                  "published_at",
+                  "heading",
+                  "full_name",
+                  "phone",
+                  "country",
+                ].includes(key)
+              )
+                values[key] = raw ? String(raw) : null;
+              else values[key] = String(raw ?? "");
+            }
+            setBusy(true);
+            setError("");
+            try {
+              await onSave(row ? String(row.id ?? row.key ?? row.user_id) : undefined, values);
+            } catch (e) {
+              setError(e instanceof Error ? e.message : "Save failed.");
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          {editable[entity].map((key) => {
+            const value = row?.[key];
+            const label = labels[key] ?? key.replaceAll("_", " ");
+            if (entity === "site_settings" && row?.key === "contact" && key === "value") {
+              const contact = (value ?? {}) as Row;
+              return (
+                <div key={key} className="grid gap-4">
+                  {contactFields.map(([k, l]) => (
+                    <label key={k} className="grid gap-2 text-sm">
+                      {l}
+                      <Input
+                        name={`contact_${k}`}
+                        type={k === "email" ? "email" : "text"}
+                        defaultValue={String(contact[k] ?? "")}
+                      />
+                    </label>
+                  ))}
+                </div>
+              );
+            }
+            if (entity === "site_settings" && row?.key === "cookies" && key === "value")
+              return (
+                <label key={key} className="grid gap-2 text-sm">
+                  Cookie notice text
+                  <Textarea
+                    name="cookie_text"
+                    rows={5}
+                    defaultValue={String((value as Row)?.text ?? "")}
+                  />
+                </label>
+              );
+            if (key === "access_level")
+              return (
+                <label key={key} className="grid gap-2 text-sm">
+                  Audience
+                  <select
+                    name={key}
+                    defaultValue={String(value ?? "public")}
+                    className="h-10 border border-input bg-background px-3"
+                  >
+                    <option value="public">Public</option>
+                    <option value="vip">VIP members</option>
+                  </select>
+                </label>
+              );
+            if (key === "user_id")
+              return (
+                <label key={key} className="grid gap-2 text-sm">
+                  Member
+                  <select
+                    name={key}
+                    required
+                    defaultValue={String(value ?? "")}
+                    className="h-10 border border-input bg-background px-3"
+                  >
+                    <option value="">Choose member</option>
+                    {members.map((m) => (
+                      <option key={String(m.id)} value={String(m.id)}>
+                        {String(m.full_name ?? m.id)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              );
+            if (["is_active", "is_featured", "is_public"].includes(key))
+              return (
+                <label key={key} className="flex items-center gap-3 text-sm">
+                  <input name={key} type="checkbox" defaultChecked={Boolean(value)} />
+                  {label}
+                </label>
+              );
+            if (key === "category_id")
+              return (
+                <label key={key} className="grid gap-2 text-sm capitalize">
+                  {label}
+                  <select
+                    name={key}
+                    defaultValue={String(value ?? "")}
+                    className="h-10 border border-input bg-background px-3"
+                  >
+                    <option value="">No category</option>
+                    {categories.map((c) => (
+                      <option key={String(c.id)} value={String(c.id)}>
+                        {String(c.name)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              );
+            const large = [
+              "analysis",
+              "content",
+              "excerpt",
+              "description",
+              "benefits",
+              "message",
+              "value",
+            ].includes(key);
+            const shown = ["content", "value"].includes(key)
+              ? JSON.stringify(value ?? {}, null, 2)
+              : Array.isArray(value)
+                ? value.join("\n")
+                : String(value ?? "");
+            return (
+              <label key={key} className="grid gap-2 text-sm capitalize">
+                {label}
+                {large ? (
+                  <Textarea
+                    name={key}
+                    rows={key === "content" || key === "value" ? 7 : 4}
+                    defaultValue={
+                      ["kickoff", "published_at", "expires_at"].includes(key) && shown
+                        ? new Date(shown).toLocaleString("sv-SE").replace(" ", "T").slice(0, 16)
+                        : shown
+                    }
+                  />
+                ) : (
+                  <Input
+                    name={key}
+                    type={
+                      key === "kickoff" || key === "published_at" || key === "expires_at"
+                        ? "datetime-local"
+                        : [
+                              "odds",
+                              "confidence",
+                              "sort_order",
+                              "read_minutes",
+                              "price",
+                              "duration_days",
+                            ].includes(key)
+                          ? "number"
+                          : "text"
+                    }
+                    step={key === "odds" || key === "price" ? "0.01" : undefined}
+                    defaultValue={
+                      ["kickoff", "published_at", "expires_at"].includes(key) && shown
+                        ? new Date(shown).toLocaleString("sv-SE").replace(" ", "T").slice(0, 16)
+                        : shown
+                    }
+                  />
+                )}
+              </label>
+            );
+          })}
+          {error && (
+            <p role="alert" className="text-sm text-destructive">
+              {error}
+            </p>
+          )}
+          <Button disabled={busy}>{busy ? "Saving…" : "Save changes"}</Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

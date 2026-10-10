@@ -13,3 +13,5 @@
 - Parent content routes render Outlet for category/article children, so direct navigation and typed links resolve independently.
 - Member accounts use immediate email/password activation; profile data and VIP requests remain owner-scoped through authenticated server functions.
 - Admin management uses server-verified user_roles and protected server functions; client state never grants admin access.
+- Prediction explanations accept only an existing prediction ID and read its facts through the authenticated client and RLS, so members cannot submit predictions or bypass VIP access.
+- Cookie notice copy is a public site setting edited through protected CMS writes, so changes propagate to the consent banner.
