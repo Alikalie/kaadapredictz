@@ -404,6 +404,7 @@ function Dashboard() {
                             {String(
                               row.title ??
                                 row.name ??
+                                (row.home_team ? `${row.home_team} vs ${row.away_team}` : undefined) ??
                                 row.subject ??
                                 row.heading ??
                                 row.full_name ??
@@ -491,7 +492,8 @@ function Dashboard() {
             setEditing(null);
           }}
           onSave={async (id, values) => {
-            await save({ data: { entity, id, values } });
+            const existing = (data[entity] ?? []).some(r => String(r.id ?? r.key ?? r.user_id) === id);
+            await save({ data: { entity, id: existing ? id : undefined, values } });
             setCreating(false);
             setEditing(null);
             await load();
