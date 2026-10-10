@@ -1,6 +1,9 @@
 # KAADA PREDICTZ roadmap
 
 ## Current request
+- [ ] Fix admin typing error and create professional sidebar
+- [ ] Real contact icons, editable cookie notice, remove homepage eyebrow
+- [ ] Replace member fixture entry with published prediction explanations
 - [ ] Remove public navigation/footer and responsible-play strip from admin
 - [ ] Plain contact settings editor and football homepage visuals
 - [ ] Secure VIP odds and admin-managed subscription expiry
