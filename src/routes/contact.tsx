@@ -1,14 +1,140 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useServerFn } from '@tanstack/react-start';
-import { useState } from 'react';
-import { Mail, Send } from 'lucide-react';
-import { FaWhatsapp, FaTelegramPlane, FaFacebookF } from 'react-icons/fa';
-import { PageHeader } from '@/components/site-shell';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { pageMeta, publicContentQuery } from '@/lib/public-content';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { sendFeedback } from '@/lib/feedback.functions';
-export const Route = createFileRoute('/contact')({ loader:({context})=>context.queryClient.ensureQueryData(publicContentQuery),head: () => pageMeta('Contact', 'Send questions and feedback to KAADA PREDICTZ.'), component: Contact });
-function Contact() { const {data}=useSuspenseQuery(publicContentQuery); const setting=data.settings.find(s=>s.key==='contact')?.value; const contact=typeof setting==='object'&&setting&&!Array.isArray(setting)?setting:{}; const email=typeof contact.email==='string'?contact.email:'fofanahalikalie0@gmail.com'; const whatsapp=typeof contact.whatsapp==='string'?contact.whatsapp:''; const telegram=typeof contact.telegram==='string'?contact.telegram:'https://t.me/kaadapredictz'; const facebook=typeof contact.facebook==='string'?contact.facebook:'https://facebook.com/kaadapredictz'; const send = useServerFn(sendFeedback); const [message, setMessage] = useState(''); const [busy, setBusy] = useState(false); return <><PageHeader eyebrow="Support" title="Contact KAADA PREDICTZ" copy="Questions, corrections, VIP requests and account support." /><div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 lg:grid-cols-[.75fr_1.25fr]"><aside><h2 className="font-display text-2xl font-black">Support channels</h2><div className="mt-6 grid gap-3"><Button asChild variant="outline" className="justify-start"><a href={`mailto:${email}`}><Mail/>{email}</a></Button>{whatsapp?<Button asChild variant="outline" className="justify-start"><a href={`https://wa.me/${whatsapp.replace(/\D/g,'')}`} target="_blank" rel="noreferrer"><FaWhatsapp/>WhatsApp support</a></Button>:<Button variant="outline" className="justify-start" disabled><FaWhatsapp/>WhatsApp number coming soon</Button>}<Button asChild variant="outline" className="justify-start"><a href={telegram} target="_blank" rel="noreferrer"><FaTelegramPlane/>Telegram</a></Button><Button asChild variant="outline" className="justify-start"><a href={facebook} target="_blank" rel="noreferrer"><FaFacebookF/>Facebook</a></Button></div></aside><form className="grid gap-5 border-l border-border pl-0 lg:pl-10" onSubmit={async e => { e.preventDefault(); const form = e.currentTarget; const d = new FormData(form); setBusy(true); setMessage(''); try { const r = await send({ data: { full_name: String(d.get('full_name')), email: String(d.get('email')), whatsapp: String(d.get('whatsapp')), subject: String(d.get('subject')), message: String(d.get('message')) } }); setMessage(`Message received. Reference: ${r.reference}`); form.reset(); } catch (error) { setMessage(error instanceof Error ? error.message : 'Message could not be sent.'); } finally { setBusy(false); } }}><h2 className="font-display text-2xl font-black">Send support a message</h2>{[['Name','full_name','text'],['Email','email','email'],['WhatsApp number (optional)','whatsapp','tel'],['Subject','subject','text']].map(([label,name,type]) => <label key={name} className="grid gap-2 text-sm">{label}<Input name={name} type={type} required={name!=='whatsapp'} maxLength={name === 'email' ? 254 : 150} /></label>)}<label className="grid gap-2 text-sm">Message<Textarea name="message" required minLength={10} maxLength={4000} rows={6} /></label><Button disabled={busy} type="submit"><Send />{busy ? 'Sending…' : 'Send message'}</Button>{message && <p role="status" className="text-sm text-primary">{message}</p>}</form></div></>; }
+import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
+import { Mail, Send } from "lucide-react";
+import { FaWhatsapp, FaTelegramPlane, FaFacebookF } from "react-icons/fa";
+import { PageHeader } from "@/components/site-shell";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { pageMeta, publicContentQuery } from "@/lib/public-content";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { sendFeedback } from "@/lib/feedback.functions";
+export const Route = createFileRoute("/contact")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(publicContentQuery),
+  head: () => pageMeta("Contact", "Send questions and feedback to KAADA PREDICTZ."),
+  component: Contact,
+});
+function Contact() {
+  const { data } = useSuspenseQuery(publicContentQuery);
+  const setting = data.settings.find((s) => s.key === "contact")?.value;
+  const contact = typeof setting === "object" && setting && !Array.isArray(setting) ? setting : {};
+  const email = typeof contact.email === "string" ? contact.email : "fofanahalikalie0@gmail.com";
+  const whatsapp = typeof contact.whatsapp === "string" ? contact.whatsapp : "";
+  const telegram =
+    typeof contact.telegram === "string" ? contact.telegram : "https://t.me/kaadapredictz";
+  const facebook =
+    typeof contact.facebook === "string" ? contact.facebook : "https://facebook.com/kaadapredictz";
+  const send = useServerFn(sendFeedback);
+  const [message, setMessage] = useState("");
+  const [busy, setBusy] = useState(false);
+  return (
+    <>
+      <PageHeader
+        eyebrow="Support"
+        title="Contact KAADA PREDICTZ"
+        copy="Questions, corrections, VIP requests and account support."
+      />
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 lg:grid-cols-[.75fr_1.25fr]">
+        <aside>
+          <h2 className="font-display text-2xl font-black">Support channels</h2>
+          <div className="mt-6 grid gap-3">
+            <Button asChild variant="outline" className="justify-start">
+              <a href={`mailto:${email}`}>
+                <Mail />
+                {email}
+              </a>
+            </Button>
+            {whatsapp ? (
+              <Button asChild variant="outline" className="justify-start">
+                <a
+                  href={`https://wa.me/${whatsapp.replace(/\D/g, "")}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <FaWhatsapp />
+                  WhatsApp support
+                </a>
+              </Button>
+            ) : (
+              <Button variant="outline" className="justify-start" disabled>
+                <FaWhatsapp />
+                WhatsApp number coming soon
+              </Button>
+            )}
+            <Button asChild variant="outline" className="justify-start">
+              <a href={telegram} target="_blank" rel="noreferrer">
+                <FaTelegramPlane />
+                Telegram
+              </a>
+            </Button>
+            <Button asChild variant="outline" className="justify-start">
+              <a href={facebook} target="_blank" rel="noreferrer">
+                <FaFacebookF />
+                Facebook
+              </a>
+            </Button>
+          </div>
+        </aside>
+        <form
+          className="grid gap-5 border-l border-border pl-0 lg:pl-10"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const form = e.currentTarget;
+            const d = new FormData(form);
+            setBusy(true);
+            setMessage("");
+            try {
+              const r = await send({
+                data: {
+                  full_name: String(d.get("full_name")),
+                  email: String(d.get("email")),
+                  whatsapp: String(d.get("whatsapp")),
+                  subject: String(d.get("subject")),
+                  message: String(d.get("message")),
+                },
+              });
+              setMessage(`Message received. Reference: ${r.reference}`);
+              form.reset();
+            } catch (error) {
+              setMessage(error instanceof Error ? error.message : "Message could not be sent.");
+            } finally {
+              setBusy(false);
+            }
+          }}
+        >
+          <h2 className="font-display text-2xl font-black">Send support a message</h2>
+          {[
+            ["Name", "full_name", "text"],
+            ["Email", "email", "email"],
+            ["WhatsApp number (optional)", "whatsapp", "tel"],
+            ["Subject", "subject", "text"],
+          ].map(([label, name, type]) => (
+            <label key={name} className="grid gap-2 text-sm">
+              {label}
+              <Input
+                name={name}
+                type={type}
+                required={name !== "whatsapp"}
+                maxLength={name === "email" ? 254 : 150}
+              />
+            </label>
+          ))}
+          <label className="grid gap-2 text-sm">
+            Message
+            <Textarea name="message" required minLength={10} maxLength={4000} rows={6} />
+          </label>
+          <Button disabled={busy} type="submit">
+            <Send />
+            {busy ? "Sending…" : "Send message"}
+          </Button>
+          {message && (
+            <p role="status" className="text-sm text-primary">
+              {message}
+            </p>
+          )}
+        </form>
+      </div>
+    </>
+  );
+}
