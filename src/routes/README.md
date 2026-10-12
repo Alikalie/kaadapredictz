@@ -1,21 +1,28 @@
-# Routes
+# Route files
 
-TanStack Start uses **file-based routing**. Every `.tsx` file in this directory
-defines a route. Do **not** create `src/pages/`, `src/routes/_app/index.tsx`, or
-`app/layout.tsx` — those are Next.js / Remix conventions. The only root layout
-is `src/routes/__root.tsx`.
+This application uses TanStack Start's file-based routing. Route files live in
+this directory and use `createFileRoute` to define page components and route
+options.
 
-## Conventions
+## Naming
 
 | File | URL |
 | --- | --- |
 | `index.tsx` | `/` |
 | `about.tsx` | `/about` |
-| `users/index.tsx` | `/users` |
-| `users/$id.tsx` | `/users/:id` (dynamic — bare `$`, no curly braces) |
-| `posts/{-$category}.tsx` | `/posts/:category?` (optional segment) |
-| `files/$.tsx` | `/files/*` (splat — read via `_splat` param, never `*`) |
-| `_layout.tsx` | layout route (renders children via `<Outlet />`) |
-| `__root.tsx` | app shell — wraps every page; preserve `<Outlet />` |
+| `predictions.tsx` | `/predictions` |
+| `predictions.$category.tsx` | `/predictions/:category` |
+| `prediction.$slug.tsx` | `/prediction/:slug` |
+| `guides.$slug.tsx` | `/guides/:slug` |
 
-`routeTree.gen.ts` is auto-generated. Don't edit it by hand.
+The `$` prefix marks a dynamic path segment. The `_authenticated` directory
+groups protected routes under a shared layout without adding that directory
+name to their URLs.
+
+## Root and generated files
+
+- `__root.tsx` defines the application shell and must render its child route
+  through `<Outlet />`.
+- `routeTree.gen.ts` is generated from the route files. Do not edit it by hand.
+- Add pages as route files here rather than creating a separate `pages`
+  directory.

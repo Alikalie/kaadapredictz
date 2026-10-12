@@ -1,0 +1,1 @@
+import{M as e}from"./index-BVy81sFP.js";var t=e({type:`function`});export{t};

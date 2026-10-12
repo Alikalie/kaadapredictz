@@ -1,29 +1,53 @@
 # KAADA PREDICTZ
 
-create website with name "KAADA PREDICTZ" with a pink and black design for t
+KAADA PREDICTZ is a football predictions and analysis website. It provides match previews, prediction results, market guides, member accounts, and VIP content.
 
-## Development
+## Requirements
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+- Node.js
+- npm
+- Supabase project credentials for data and authentication
+
+## Getting started
+
+Install dependencies and start the local development server:
 
 ```powershell
-git clone <this-repository-url>
-cd <repository-name>
-npm install
+npm ci
 npm run dev
 ```
 
-## Deploy to Vercel
+Create a local `.env` file with the required Supabase settings:
 
-Import this repository into Vercel and use `npm run build` as the build command. The Vite configuration selects Nitro's Vercel preset, which generates the Vercel deployment output.
-
-Before deploying, add these environment variables in the Vercel project settings:
-
-| Variable | Purpose |
+| Variable | Used by |
 | --- | --- |
-| `SUPABASE_URL` | Supabase project URL used by server-side requests |
-| `SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key used by server-side requests |
-| `VITE_SUPABASE_URL` | Supabase project URL used by the browser |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Supabase publishable key used by the browser |
+| `SUPABASE_URL` | Server-side Supabase requests |
+| `SUPABASE_PUBLISHABLE_KEY` | Server-side Supabase requests |
+| `VITE_SUPABASE_URL` | Browser-side Supabase requests |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Browser-side Supabase requests |
 
-Set them for each environment you deploy (Production, Preview, and Development as needed), then redeploy after changing the values.
+Use the values for your own Supabase project. Do not commit `.env` files or credentials.
+
+## Available commands
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Create a production build |
+| `npm run preview` | Preview the production build locally |
+| `npm test` | Run the test suite |
+| `npm run lint` | Check the code with ESLint |
+
+## Project structure
+
+- `src/routes/` contains the file-based TanStack Start pages.
+- `src/components/` contains shared page components and UI primitives.
+- `src/lib/` contains application data access and server functions.
+- `src/integrations/supabase/` contains Supabase client and authentication integration.
+- `drizzle/` contains the database schema and migrations.
+
+See [`src/routes/README.md`](src/routes/README.md) for route conventions.
+
+## Deployment
+
+The project is configured for Vercel. Import the repository into Vercel, configure the four Supabase environment variables above for the environments you use, and deploy using the `npm run build` build command.

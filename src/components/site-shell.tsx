@@ -22,11 +22,15 @@ const nav = [
 ] as const;
 
 export function Wordmark() {
-  const name = str(getSetting(useSettings(), "brand").name, "KAADA PREDICTZ");
-  const [first, ...rest] = name.split(" ");
   return (
-    <Link to="/" className="font-display text-xl font-black tracking-normal text-foreground">
-      {first} <span className="text-primary">{rest.join(" ")}</span>
+    <Link to="/" aria-label="KAADA PREDICTZ home" className="inline-flex shrink-0 items-center">
+      <img
+        src="/kaada-predictz-logo.jpeg"
+        alt="KAADA PREDICTZ"
+        width={128}
+        height={64}
+        className="h-12 w-24 object-contain"
+      />
     </Link>
   );
 }
