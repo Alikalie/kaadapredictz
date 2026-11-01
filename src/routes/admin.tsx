@@ -30,6 +30,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { deleteAdminRecord, getAdminData, saveAdminRecord } from "@/lib/admin.functions";
 import { pageMeta } from "@/lib/public-content";
 import { AdminAccuracy } from "@/components/admin-accuracy";
+import { AdminMembers } from "@/components/admin-members";
 
 const sections = [
   ["predictions", "Predictions & results"],
@@ -360,6 +361,9 @@ function Dashboard() {
                 className="pl-9"
               />
             </div>
+            {entity === "profiles" ? (
+              <AdminMembers search={search} />
+            ) : (<>
             <div className="mb-5 flex items-center justify-between">
               <div>
                 <h2 className="font-display text-2xl font-black">
@@ -479,6 +483,7 @@ function Dashboard() {
                 </table>
               </div>
             )}
+            </>)}
           </main>
         </div>
         <RecordDialog
