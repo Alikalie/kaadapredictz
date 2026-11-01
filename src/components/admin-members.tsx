@@ -15,7 +15,7 @@ const roleLabels: Record<string, string> = {
 
 function roleOf(m: Member) {
   if (m.roles.includes("super_admin")) return "super_admin";
-  return m.roles.find((r) => r !== "super_admin") ?? "member";
+  return m.roles.find((r: string) => r !== "super_admin") ?? "member";
 }
 
 export function AdminMembers({ search }: { search: string }) {
