@@ -25,7 +25,7 @@ export function Wordmark() {
   return (
     <Link to="/" aria-label="KAADA PREDICTZ home" className="inline-flex shrink-0 items-center">
       <img
-        src="/kaada-predictz-logo.jpeg"
+        src="/kaada-predictz-logo.png"
         alt="KAADA PREDICTZ"
         width={128}
         height={64}
