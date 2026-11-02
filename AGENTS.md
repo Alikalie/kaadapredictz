@@ -15,3 +15,4 @@
 - Admin management uses server-verified user_roles and protected server functions; client state never grants admin access.
 - Prediction explanations accept only an existing prediction ID and read its facts through the authenticated client and RLS, so members cannot submit predictions or bypass VIP access.
 - Cookie notice copy is a public site setting edited through protected CMS writes, so changes propagate to the consent banner.
+- Admin-updated VIP odds reuse predictions; protected feed reads recheck subscription expiry and refresh independently, while editors stamp update times and never expose VIP analysis through public loaders.

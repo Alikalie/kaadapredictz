@@ -8,7 +8,7 @@ import { getMyAccount, saveMyProfile } from '@/lib/member.functions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { pageMeta } from '@/lib/public-content';
-import { PredictionTable } from '@/components/prediction-table';
+import { VipOddsFeed } from '@/components/vip-odds-feed';
 import { PredictionExplanation } from '@/components/prediction-explanation';
 import { vipActive } from '@/lib/prediction-metrics';
 
@@ -52,7 +52,7 @@ function Dashboard() {
         <div className="mt-6 grid gap-2 text-sm"><Link to="/predictions" className="text-primary font-bold">Today's predictions →</Link><Link to="/results" className="text-primary font-bold">Past results →</Link><Link to="/contact" className="text-primary font-bold">Contact support →</Link></div>
       </section>
     </div>
-    <section className="mt-10 border-t border-border pt-8"><div className="mb-5 flex flex-wrap items-center justify-between gap-3"><h2 className="font-display text-2xl font-black">VIP odds</h2><p className="text-sm text-muted-foreground">{data.subscription?.expires_at?`Subscription ${activeVip?'expires':'expired'}: ${new Date(data.subscription.expires_at).toLocaleString()}`:'No active VIP subscription'}</p></div>{activeVip||isAdmin?<PredictionTable items={data.vipPredictions}/>:<Button asChild><Link to="/vip">Request VIP access</Link></Button>}</section>
+    <VipOddsFeed roles={data.roles} />
     <PredictionExplanation/>
   </div>;
 }
