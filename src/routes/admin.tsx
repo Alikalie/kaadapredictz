@@ -31,6 +31,7 @@ import { deleteAdminRecord, getAdminData, saveAdminRecord } from "@/lib/admin.fu
 import { pageMeta } from "@/lib/public-content";
 import { AdminAccuracy } from "@/components/admin-accuracy";
 import { AdminMembers } from "@/components/admin-members";
+import { AdminVipOdds } from "@/components/admin-vip-odds";
 
 const sections = [
   ["predictions", "Predictions & results"],
@@ -216,6 +217,7 @@ function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [entity, setEntity] = useState<Entity>("predictions");
+  const [vipView, setVipView] = useState(false);
   const [data, setData] = useState<Record<string, Row[]>>({});
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -267,10 +269,11 @@ function Dashboard() {
             return (
               <Button
                 key={id}
-                variant={entity === id ? "secondary" : "ghost"}
+                variant={entity === id && !vipView ? "secondary" : "ghost"}
                 className={`h-11 w-full justify-start gap-3 ${entity === id ? "text-primary" : ""}`}
                 onClick={() => {
                   setEntity(id);
+                  setVipView(false);
                   setSearch("");
                   setSidebarOpen(false);
                 }}
@@ -280,11 +283,13 @@ function Dashboard() {
               </Button>
             );
           })}
+          <Button variant={vipView ? "secondary" : "ghost"} className="h-11 w-full justify-start gap-3" onClick={() => { setVipView(true); setSearch(''); setSidebarOpen(false); }}><Crown className="size-4" />VIP live odds</Button>
           <Button
             variant="ghost"
             className="h-11 w-full justify-start gap-3"
             onClick={() => {
               setEntity("site_settings");
+              setVipView(false);
               setEditing(
                 (data.site_settings ?? []).find((r) => r.key === "cookies") ?? {
                   key: "cookies",
@@ -350,7 +355,7 @@ function Dashboard() {
         </header>
         <div className="p-5 lg:p-8">
           <main className="min-w-0">
-            {entity === "predictions" && <AdminAccuracy rows={data.predictions ?? []} />}
+            {!vipView && entity === "predictions" && <AdminAccuracy rows={data.predictions ?? []} />}
             <div className="relative mb-5 max-w-sm">
               <Search className="absolute left-3 top-3 size-4 text-muted-foreground" />
               <Input
@@ -361,7 +366,7 @@ function Dashboard() {
                 className="pl-9"
               />
             </div>
-            {entity === "profiles" ? (
+            {vipView ? <AdminVipOdds rows={(data.predictions ?? []).filter(r => JSON.stringify(r).toLowerCase().includes(search.toLowerCase()))} onSaved={load} /> : entity === "profiles" ? (
               <AdminMembers search={search} />
             ) : (<>
             <div className="mb-5 flex items-center justify-between">
